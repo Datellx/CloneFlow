@@ -18,6 +18,7 @@ from .auth import (Ctx, check_password, clear_session, current, get_clone, hash_
 from .config import settings
 from .flags import FEATURE_FLAGS
 from .plans import PLANS, plan_of
+from . import supabase
 
 router = APIRouter(prefix="/api")
 
@@ -40,7 +41,7 @@ def system_status():
             "model": settings.chat_model if settings.llm_provider != "mock" else "mock",
             "tts_provider": settings.tts_provider, "version": "1.0.0", "product": True,
             "flags": FEATURE_FLAGS, "plans": list(PLANS.values()), "download": _downloads(),
-            "desktop_mode": False}
+            "auth": supabase.public_config(), "desktop_mode": False}
 
 
 # ------------------------------------------------------------------ auth
@@ -91,22 +92,56 @@ def _home(db, user: User, owned: list[int]) -> str:
     return "/ask"  # a colleague: they ask the knowledge base
 
 
-@router.post("/auth/signup")
-def signup(body: SignupIn, response: Response, db=Depends(get_db)):
-    email = body.email.strip().lower()
-    validate_new_account(email, body.password, body.name)
-    if not body.org_name.strip():
+def _create_org(db, org_name: str, name: str, email: str, password_hash: str = "", auth_id: str | None = None) -> User:
+    if not org_name.strip():
         raise HTTPException(400, "Enter your organization's name.")
     if db.scalar(select(User).where(User.email == email)):
         raise HTTPException(409, "An account with this email already exists. Sign in instead.")
-    org = Org(name=body.org_name.strip()[:200], slug=_slug(db, body.org_name))
+    org = Org(name=org_name.strip()[:200], slug=_slug(db, org_name))
     db.add(org)
     db.flush()
-    user = User(org_id=org.id, name=body.name.strip()[:200], email=email, password_hash=hash_password(body.password),
-                role="admin")
+    user = User(org_id=org.id, name=(name or email.split("@")[0]).strip()[:200], email=email,
+                password_hash=password_hash, auth_id=auth_id, role="admin")
     db.add(user)
-    db.flush()
     db.commit()
+    return user
+
+
+def _accept_invite(db, code: str, name: str, email: str, password_hash: str = "", auth_id: str | None = None) -> User:
+    inv = db.scalar(select(Invite).where(Invite.code == (code or "").strip()))
+    if not inv or inv.accepted:
+        raise HTTPException(404, "This invite link is invalid or was already used.")
+    if auth_id and inv.email != email:  # a verified email must match the invitation
+        raise HTTPException(403, f"This invitation is for {inv.email}. Sign in with that email address.")
+    if db.scalar(select(User).where(User.email == email)):
+        raise HTTPException(409, "An account with this email already exists. Sign in instead.")
+    user = User(org_id=inv.org_id, name=(name or email.split("@")[0]).strip()[:200], email=email,
+                password_hash=password_hash, auth_id=auth_id, role=inv.role)
+    db.add(user)
+    inv.accepted = True
+    db.flush()
+    # The handover created for this person's email becomes theirs.
+    for c in db.scalars(select(Clone).where(Clone.org_id == inv.org_id, Clone.owner_user_id.is_(None))):
+        if (c.settings or {}).get("owner_email") == email:
+            c.owner_user_id = user.id
+    db.commit()
+    return user
+
+
+def _local_only() -> None:
+    from . import supabase
+
+    if supabase.enabled():
+        raise HTTPException(409, "Please use the sign-up page; accounts are verified by email.")
+
+
+@router.post("/auth/signup")
+def signup(body: SignupIn, response: Response, db=Depends(get_db)):
+    """Built-in sign-up (only when Supabase is not configured)."""
+    _local_only()
+    email = body.email.strip().lower()
+    validate_new_account(email, body.password, body.name)
+    user = _create_org(db, body.org_name, body.name, email, hash_password(body.password))
     set_session(response, user)
     return me_payload(db, user)
 
@@ -114,7 +149,7 @@ def signup(body: SignupIn, response: Response, db=Depends(get_db)):
 @router.post("/auth/login")
 def login(body: LoginIn, response: Response, db=Depends(get_db)):
     user = db.scalar(select(User).where(User.email == body.email.strip().lower()))
-    if not user or not check_password(body.password, user.password_hash):
+    if not user or not user.password_hash or not check_password(body.password, user.password_hash):
         raise HTTPException(401, "That email and password don't match.")
     set_session(response, user)
     return me_payload(db, user)
@@ -122,23 +157,49 @@ def login(body: LoginIn, response: Response, db=Depends(get_db)):
 
 @router.post("/auth/join")
 def join(body: JoinIn, response: Response, db=Depends(get_db)):
-    inv = db.scalar(select(Invite).where(Invite.code == body.invite_code.strip()))
-    if not inv or inv.accepted:
-        raise HTTPException(404, "This invite link is invalid or was already used.")
+    """Built-in invitation sign-up (only when Supabase is not configured)."""
+    _local_only()
     email = body.email.strip().lower()
     validate_new_account(email, body.password, body.name)
-    if db.scalar(select(User).where(User.email == email)):
-        raise HTTPException(409, "An account with this email already exists. Sign in instead.")
-    user = User(org_id=inv.org_id, name=body.name.strip()[:200], email=email,
-                password_hash=hash_password(body.password), role=inv.role)
-    db.add(user)
-    inv.accepted = True
-    db.flush()
-    # A clone created for this person's email becomes theirs.
-    for c in db.scalars(select(Clone).where(Clone.org_id == inv.org_id, Clone.owner_user_id.is_(None))):
-        if (c.settings or {}).get("owner_email") == email:
-            c.owner_user_id = user.id
-    db.commit()
+    user = _accept_invite(db, body.invite_code, body.name, email, hash_password(body.password))
+    set_session(response, user)
+    return me_payload(db, user)
+
+
+class SessionIn(BaseModel):
+    access_token: str
+    org_name: str = ""
+    name: str = ""
+    invite_code: str = ""
+
+
+@router.post("/auth/session")
+def supabase_session(body: SessionIn, response: Response, db=Depends(get_db)):
+    """After signing in with Supabase: verify the token, find or create the Clone Flow account, start a session.
+    New accounts come from the sign-up form (organization name) or an invitation (invite code), either passed here
+    or saved on the Supabase user at sign-up."""
+    from . import supabase
+
+    su = supabase.get_user(body.access_token)
+    if not su or not su.get("email"):
+        raise HTTPException(401, "Your sign-in expired. Please sign in again.")
+    if not (su.get("email_confirmed_at") or su.get("confirmed_at")):
+        raise HTTPException(403, "Please confirm your email first — we sent you a link.")
+    email, auth_id, meta = su["email"].strip().lower(), su["id"], su.get("user_metadata") or {}
+    user = db.scalar(select(User).where(User.auth_id == auth_id)) or db.scalar(select(User).where(User.email == email))
+    if user is None:
+        code = body.invite_code or meta.get("invite_code") or ""
+        name = body.name or meta.get("name") or ""
+        if code:
+            user = _accept_invite(db, code, name, email, auth_id=auth_id)
+        elif body.org_name or meta.get("org_name"):
+            user = _create_org(db, body.org_name or meta["org_name"], name, email, auth_id=auth_id)
+        else:
+            raise HTTPException(404, f"There's no Clone Flow account for {email} yet. Ask your admin for an "
+                                     "invitation, or create your organization.")
+    elif not user.auth_id:
+        user.auth_id = auth_id
+        db.commit()
     set_session(response, user)
     return me_payload(db, user)
 

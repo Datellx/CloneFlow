@@ -10,7 +10,7 @@ services:
     autoDeploy: true
     disk:
       name: data
-      mountPath: /var/data   # database, uploads, video frames
+      mountPath: /var/data   # uploads, video frames (and the database if DATABASE_URL is not set)
       sizeGB: 2
     envVars:
       - key: DATA_DIR
@@ -28,6 +28,15 @@ services:
       - key: MODEL_API_KEY    # Meta Model API key
         sync: false
       - key: PUBLIC_URL       # this service's address, e.g. https://cloneflow-engine.onrender.com
+        sync: false
+      # Supabase: sign-in + email (Auth) and the Postgres database
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: DATABASE_URL     # Supabase → Connect → Session pooler string (port 5432)
         sync: false
       # Desktop app downloads (after the "Desktop apps" GitHub workflow has published a release)
       - key: DOWNLOAD_MAC_URL

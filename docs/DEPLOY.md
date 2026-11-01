@@ -1,8 +1,9 @@
-# Deploying Clone Flow on Render
+# Deploying Clone Flow (Render + Supabase)
 
-One Render service does everything: the Docker build compiles the website, and the engine serves the website and
-the API from the same address. The database, uploads and video frames live on a persistent disk at `/var/data`, so
-redeploys never erase data.
+- **Render** runs one service: the Docker build compiles the website, and the engine serves the website and the API
+  from the same address. Uploads and video frames live on a persistent disk at `/var/data`.
+- **Supabase** provides sign-in (verified emails, password resets, invitation emails) and the Postgres database.
+  Without Supabase settings the engine falls back to built-in sign-in and a SQLite file on the disk.
 
 ## 1. Create the service (about $7/month + $0.50/month for the 2 GB disk)
 1. render.com → **New → Blueprint** → pick the GitHub repo. Render reads `render.yaml` (Docker, Starter plan, disk).
@@ -17,7 +18,21 @@ redeploys never erase data.
 
 Every push to `main` redeploys automatically.
 
-## 2. Connectors (when the apps exist)
+## 2. Supabase
+1. **Connect → Session pooler** → copy the connection string (port 5432, user `postgres.<project-ref>`), put your
+   database password in it, and save it in Render as `DATABASE_URL`. (Use the pooler: Render can't reach the direct
+   IPv6 address.) On first start the engine creates its tables and turns on Row Level Security for all of them, so
+   Supabase's public API can't read Clone Flow data.
+2. **Project Settings → API**: `SUPABASE_URL`, `SUPABASE_ANON_KEY` (public) and `SUPABASE_SERVICE_ROLE_KEY` (secret,
+   server only) in Render.
+3. **Authentication → URL Configuration**: Site URL = the site address; Redirect URLs: `https://<address>/**` and
+   `http://localhost:8000/**`.
+4. **Authentication → Sign In / Providers → Email**: keep "Confirm email" on. Minimum password length 8.
+5. **Authentication → Emails → SMTP Settings**: add your own SMTP (for example Resend) before real customers —
+   Supabase's built-in sender only allows a few emails per hour. Edit the "Confirm signup", "Invite user" and
+   "Reset password" templates to say Clone Flow.
+
+## 3. Connectors (when the apps exist)
 Redirect URLs to register (with the Render address, or your own domain once it points at Render):
 - Google: `https://<address>/api/connect/google/callback`
 - Microsoft: `https://<address>/api/connect/microsoft/callback`
@@ -25,11 +40,12 @@ Redirect URLs to register (with the Render address, or your own domain once it p
 
 Add the client id/secret pairs in Render → Environment. The Teams webhook URL is shown on Admin → Teams.
 
-## 3. Your own domain (optional)
+## 4. Your own domain (optional)
 Render → the service → Settings → Custom Domains → add e.g. `app.yourdomain.com` and create the DNS record Render
-shows. Then change `PUBLIC_URL` to the new address and update the connector redirect URLs.
+shows. Then change `PUBLIC_URL` to the new address and update the Supabase URL configuration and the connector
+redirect URLs.
 
-## 4. Desktop apps (Mac and Windows)
+## 5. Desktop apps (Mac and Windows)
 1. GitHub → the repo → Settings → Secrets and variables → Actions → **Variables** → add `CLONEFLOW_URL` = the site
    address.
 2. Actions → **Desktop apps** → Run workflow. It builds `CloneFlow.dmg` and `CloneFlow-Setup.exe` and attaches them

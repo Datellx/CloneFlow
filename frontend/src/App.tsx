@@ -6,7 +6,7 @@ import { useMe, useStatus } from "./lib/api";
 import { isCloudApp } from "./lib/desktop";
 import { homeFor } from "./lib/home";
 import Landing from "./site/Landing";
-import { Join, Login, Signup } from "./site/Auth";
+import { AuthCallback, Join, Login, ResetPassword, Signup } from "./site/Auth";
 import DownloadPage, { PrivacyPage, TermsPage } from "./site/Download";
 import NotFound from "./site/NotFound";
 import Walk from "./shared/routes/Walk";
@@ -61,6 +61,8 @@ export default function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/join/:code" element={<Join />} />
+      <Route path="/auth/callback" element={<AuthCallback />} />
+      <Route path="/auth/reset" element={<ResetPassword />} />
       <Route path="/download" element={<DownloadPage />} />
       <Route path="/privacy" element={<PrivacyPage />} />
       <Route path="/terms" element={<TermsPage />} />

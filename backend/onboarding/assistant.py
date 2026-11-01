@@ -161,14 +161,16 @@ def message(user: User, text: str) -> dict:
             try:
                 r = PEOPLE.invite(db, org, admin, p)
                 invites.append({"name": r["employee"]["name"], "email": p.get("email", "").lower(), "link": r["link"],
-                                "eid": r["employee"]["id"]})
+                                "eid": r["employee"]["id"], "emailed": r.get("emailed", False)})
             except PEOPLE.InviteError as exc:
                 problems.append(str(exc))
         reply = (out.get("reply") or "Got it.").strip()
         if invites:
             names = ", ".join(i["name"] for i in invites)
+            sent = all(i["emailed"] for i in invites)
             _say(db, org_id, f"I created {'an invitation' if len(invites) == 1 else 'invitations'} for {names}. "
-                             "Send the link however you like; it opens their private handover conversation.",
+                             + ("I emailed it; the link below works too." if sent else
+                                "Send the link however you like; it opens their private handover conversation."),
                  payload={"invites": invites})
         for prob in problems:
             _say(db, org_id, prob, payload={"problem": True})

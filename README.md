@@ -87,7 +87,8 @@ node e2e/web_flow.mjs http://localhost:8000 /tmp/shots   # browser walk-through 
 ## Deploy
 
 One service on **Render** builds the website and runs the engine that serves it and the API (`Dockerfile`,
-`render.yaml`, persistent disk for the database and uploads). Desktop apps for Mac and Windows are built by GitHub
+`render.yaml`, persistent disk for uploads). **Supabase** provides sign-in (verified emails, password resets,
+invitation emails) and the Postgres database. Desktop apps for Mac and Windows are built by GitHub
 Actions (`.github/workflows/desktop.yml`). Step by step: [docs/DEPLOY.md](docs/DEPLOY.md).
 
 ## Repository
@@ -99,7 +100,7 @@ backend/
   handover/     the departing employee's conversation, Microsoft 365 / Gmail / GitHub connectors, Teams webhook
   knowledge/    reading sources, personal vs work, cards, interview, phone walk, Ask, the Muse client
   media/        video key frames, face blur, audio
-  db/           SQLAlchemy models (SQLite by default)
+  db/           SQLAlchemy models (Supabase Postgres in production, SQLite for development)
 frontend/src/
   site/         marketing pages, sign-up, sign-in, invitation
   app/          setup assistant, the handover conversation, the admin console

@@ -71,6 +71,10 @@ class Settings:
     # Master switch for paid model calls. Off means the engine never contacts the model API.
     ai_enabled: bool = field(default_factory=lambda: _bool("AI_ENABLED", True))
     public_url: str = field(default_factory=lambda: os.environ.get("PUBLIC_URL", "http://localhost:8000"))
+    # Supabase (sign-in and email). Postgres is DATABASE_URL above.
+    supabase_url: str = field(default_factory=lambda: os.environ.get("SUPABASE_URL", "").strip())
+    supabase_anon_key: str = field(default_factory=lambda: os.environ.get("SUPABASE_ANON_KEY", "").strip())
+    supabase_service_key: str = field(default_factory=lambda: os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "").strip())
 
     def __post_init__(self) -> None:
         if not self.llm_provider:

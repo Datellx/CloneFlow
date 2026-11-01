@@ -2,7 +2,7 @@
 import { useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-import { api } from "@/lib/api";
+import { signOutEverywhere } from "@/lib/auth";
 
 /** Where a signed-out visitor goes (one sign-in page; the email finds the organization). */
 export function signInPath(next?: string) {
@@ -17,11 +17,7 @@ export function useSignOut(before?: () => void) {
   return useCallback(
     async (_slug?: string | null) => {
       before?.();
-      try {
-        await api.logout();
-      } catch {
-        /* already signed out */
-      }
+      await signOutEverywhere();
       qc.clear();
       nav("/login", { replace: true });
     },
