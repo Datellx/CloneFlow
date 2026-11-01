@@ -13,6 +13,7 @@ import hashlib
 import json
 import logging
 import os
+import random
 import re
 import secrets
 import threading
@@ -294,18 +295,30 @@ def _import_google(eid: int) -> dict:
                 break
         ids = ids[:MAX_MAIL]
 
+        problems: list[str] = []
+
         def fetch(mid):
-            for attempt in range(4):
+            # Gmail answers 403 (rateLimitExceeded / userRateLimitExceeded) or 429 when read too fast: back off and retry.
+            for attempt in range(6):
                 rr = cx.get(f"{base}/messages/{mid}", params={"format": "raw"})
-                if rr.status_code == 429:
-                    time.sleep(1 + attempt)
+                if rr.status_code == 200:
+                    return rr.json()
+                body = rr.text[:300]
+                if rr.status_code in (429, 500, 502, 503) or (rr.status_code == 403 and "ateLimit" in body):
+                    time.sleep(min(2 ** attempt, 20) + random.random())
                     continue
-                rr.raise_for_status()
-                return rr.json()
+                problems.append(f"{rr.status_code}: {body}")
+                return None
+            problems.append("rate limited")
             return None
 
-        with ThreadPoolExecutor(max_workers=8) as ex:
+        with ThreadPoolExecutor(max_workers=4) as ex:
             raws = list(ex.map(fetch, ids))
+        if ids and not any(raws):
+            log.warning("gmail import: no message could be read: %s", problems[:3])
+            raise RuntimeError("Gmail didn't let Clone Flow read the messages. Reconnect and allow reading email.")
+        if problems:
+            log.info("gmail import: %d of %d messages skipped (%s)", len(problems), len(ids), problems[0][:200])
     n = 0
     with SessionLocal() as db:
         seen = {i for (i,) in db.execute(select(SourceItem.ext_id).where(SourceItem.clone_id == eid, SourceItem.kind == "mail"))}

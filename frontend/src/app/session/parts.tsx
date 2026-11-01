@@ -68,6 +68,8 @@ export function ProviderTile({
   const importing = p.connected && p.status === "importing";
   const failed = p.status === "error";
   const counts = countLine(p.counts);
+  // Sources the organization hasn't set up aren't offered: the person only sees what they can actually connect.
+  if (!real && !p.connected) return null;
   const icon = (
     <span
       className={cn(
