@@ -1,0 +1,73 @@
+{
+  "name": "clone-flow-app",
+  "productName": "Clone Flow",
+  "version": "1.0.0",
+  "description": "Clone Flow desktop app \u2014 your organization's Clone Flow in its own window (Mac and Windows).",
+  "author": "Datellx LLC",
+  "main": "main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dist:mac": "electron-builder --mac --universal --publish never",
+    "dist:win": "electron-builder --win --x64 --publish never"
+  },
+  "devDependencies": {
+    "electron": "33.2.1",
+    "electron-builder": "25.1.8"
+  },
+  "build": {
+    "appId": "com.datellx.cloneflow.app",
+    "productName": "Clone Flow",
+    "copyright": "\u00a9 2026 Datellx LLC",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "offline.html",
+      "config.json",
+      "build/icon.png"
+    ],
+    "protocols": [
+      {
+        "name": "Clone Flow",
+        "schemes": [
+          "cloneflow"
+        ]
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.business",
+      "target": [
+        "dmg"
+      ],
+      "icon": "build/icon.icns",
+      "identity": null,
+      "hardenedRuntime": false,
+      "extendInfo": {
+        "NSMicrophoneUsageDescription": "Clone Flow records your spoken answers during your handover interview.",
+        "NSCameraUsageDescription": "Clone Flow uses the camera only when you choose to show something.",
+        "NSScreenCaptureUsageDescription": "Clone Flow records your screen only when you choose to show how you do a task."
+      }
+    },
+    "dmg": {
+      "title": "Clone Flow",
+      "backgroundColor": "#fbf8f7",
+      "artifactName": "CloneFlow.dmg"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "build/icon.png"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "artifactName": "CloneFlow-Setup.exe",
+      "shortcutName": "Clone Flow"
+    }
+  }
+}

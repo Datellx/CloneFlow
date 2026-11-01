@@ -1,0 +1,200 @@
+@import "@fontsource-variable/newsreader/opsz.css";
+@import "@fontsource-variable/newsreader/opsz-italic.css";
+@import "@fontsource-variable/geist/index.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-paper text-ink font-sans text-[15px] leading-relaxed;
+    font-feature-settings: "ss01", "cv11";
+  }
+  h1, h2, h3, .font-display {
+    font-family: "Newsreader Variable", Georgia, serif;
+    font-optical-sizing: auto;
+    letter-spacing: -0.012em;
+  }
+  ::selection {
+    background: #ecc6d0;
+    color: #300914;
+  }
+  :focus-visible {
+    outline: 2px solid #7a1e3a;
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+  input, textarea, select, button {
+    font: inherit;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .input {
+    @apply w-full rounded-lg border border-line-strong bg-white px-3.5 py-2.5 text-[15px] text-ink placeholder:text-ink-faint
+      transition-[border-color,box-shadow] duration-150 focus:border-brand-600 focus:shadow-ring focus:outline-none
+      disabled:bg-paper disabled:text-ink-muted;
+  }
+  .label {
+    @apply mb-1.5 block text-sm font-medium text-ink-soft;
+  }
+  .card {
+    @apply rounded-2xl border border-line bg-white shadow-card;
+  }
+  .tnum {
+    font-variant-numeric: tabular-nums;
+  }
+  .prose-quote {
+    font-family: "Newsreader Variable", Georgia, serif;
+    font-optical-sizing: auto;
+  }
+  .scroll-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #dcd0cd transparent;
+  }
+  .skeleton {
+    @apply relative overflow-hidden rounded-md bg-[#F2ECEA];
+  }
+  .skeleton::after {
+    content: "";
+    @apply absolute inset-0 -translate-x-full animate-shimmer;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
+  }
+}
+
+/* ---------------------------------------------------------------- Mac app */
+/* Electron uses titleBarStyle "hiddenInset": the traffic lights sit at ~(18,18). */
+@layer components {
+  .titlebar-drag {
+    -webkit-app-region: drag;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .desktop-only {
+    display: none;
+  }
+  html.desktop .desktop-only {
+    display: block;
+  }
+}
+html.desktop button,
+html.desktop a,
+html.desktop input,
+html.desktop textarea,
+html.desktop select,
+html.desktop label,
+html.desktop [role="button"],
+html.desktop [role="dialog"],
+html.desktop canvas,
+html.desktop video {
+  -webkit-app-region: no-drag;
+}
+
+/* ---------------------------------------------------------- v2: interviewer orb */
+@layer components {
+  .orb .orb-body {
+    transform-box: fill-box;
+    transform-origin: 50% 60%;
+    animation: orb-breathe 4.2s ease-in-out infinite;
+  }
+  .orb-speaking .orb-body {
+    animation: orb-talk 0.9s ease-in-out infinite;
+  }
+  .orb-listening .orb-body {
+    animation-duration: 2.4s;
+  }
+  .orb .orb-eyes {
+    transform-box: fill-box;
+    transform-origin: 50% 55%;
+    animation: orb-blink 5.2s infinite;
+  }
+  .orb .orb-glow {
+    transform-origin: 100px 104px;
+    animation: orb-glow 4.2s ease-in-out infinite;
+  }
+  .orb .orb-orbit {
+    animation: orb-spin 2.6s linear infinite;
+  }
+  @keyframes orb-breathe {
+    0%, 100% { transform: scale(1) translateY(0); }
+    50% { transform: scale(1.025, 1.035) translateY(-2px); }
+  }
+  @keyframes orb-talk {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    30% { transform: scale(1.02, 1.03) rotate(-1deg); }
+    70% { transform: scale(1.015, 1.01) rotate(1deg); }
+  }
+  @keyframes orb-blink {
+    0%, 93%, 100% { transform: scaleY(1); }
+    95% { transform: scaleY(0.1); }
+  }
+  @keyframes orb-glow {
+    0%, 100% { transform: scale(1); opacity: 0.9; }
+    50% { transform: scale(1.06); opacity: 1; }
+  }
+  @keyframes orb-spin {
+    to { transform: rotate(360deg); }
+  }
+  .feed-enter {
+    animation: feed-in 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+  @keyframes feed-in {
+    from { opacity: 0; transform: translateY(-8px); background-color: #fbf2f4; }
+    60% { background-color: #fbf2f4; }
+    to { opacity: 1; transform: translateY(0); background-color: transparent; }
+  }
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ------------------------------------------------- v4: Clone Flow app for Mac */
+/* titleBarStyle "hiddenInset": a 28px draggable strip on top keeps the traffic lights clear of the UI. */
+html.cloud-app body {
+  padding-top: 28px;
+}
+html.cloud-app body::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 28px;
+  z-index: 70;
+  -webkit-app-region: drag;
+}
+html.cloud-app .h-\[100dvh\],
+html.cloud-app .min-h-\[100dvh\],
+html.cloud-app .min-h-screen {
+  min-height: calc(100dvh - 28px);
+}
+html.cloud-app .h-\[100dvh\] {
+  height: calc(100dvh - 28px);
+}
+html.cloud-app .fixed.inset-y-0,
+html.cloud-app .sticky.top-0 {
+  top: 28px;
+}
+@media (min-width: 1024px) {
+  html.cloud-app .lg\:h-\[100dvh\] {
+    height: calc(100dvh - 28px);
+  }
+}

@@ -1,0 +1,49 @@
+# Render Blueprint: Clone Flow (website + engine in one service). Render dashboard → New → Blueprint → this repo.
+# Secrets marked sync: false are typed into the Render dashboard, never committed.
+services:
+  - type: web
+    name: cloneflow-engine
+    runtime: docker
+    plan: starter            # always on; a persistent disk needs a paid instance
+    region: ohio
+    healthCheckPath: /api/system/status
+    autoDeploy: true
+    disk:
+      name: data
+      mountPath: /var/data   # database, uploads, video frames
+      sizeGB: 2
+    envVars:
+      - key: DATA_DIR
+        value: /var/data
+      - key: LLM_PROVIDER
+        value: meta
+      - key: AI_ENABLED
+        value: "1"
+      - key: COOKIE_SECURE
+        value: "1"
+      - key: ORG_AI_CAP_USD   # AI allowance per organization (free trial)
+        value: "2"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: MODEL_API_KEY    # Meta Model API key
+        sync: false
+      - key: PUBLIC_URL       # this service's address, e.g. https://cloneflow-engine.onrender.com
+        sync: false
+      # Desktop app downloads (after the "Desktop apps" GitHub workflow has published a release)
+      - key: DOWNLOAD_MAC_URL
+        sync: false
+      - key: DOWNLOAD_WINDOWS_URL
+        sync: false
+      # Connectors (add later, once the apps are registered)
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: MS_CLIENT_ID
+        sync: false
+      - key: MS_CLIENT_SECRET
+        sync: false
+      - key: GITHUB_CLIENT_ID
+        sync: false
+      - key: GITHUB_CLIENT_SECRET
+        sync: false
