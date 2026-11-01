@@ -213,7 +213,9 @@ def invite_info(code: str, db=Depends(get_db)):
     clone = next((c for c in db.scalars(select(Clone).where(Clone.org_id == org.id, Clone.owner_user_id.is_(None)))
                   if (c.settings or {}).get("owner_email") == inv.email), None)
     inviter = db.get(User, inv.created_by) if inv.created_by else None
-    return {"org_name": org.name, "email": inv.email, "role": inv.role, "name": clone.expert_name if clone else "",
+    return {"org_name": org.name, "email": inv.email, "role": inv.role,
+            "kind": "handover" if clone else (inv.kind or "colleague"),
+            "name": clone.expert_name if clone else (inv.name or ""),
             "title": clone.title if clone else "", "leaving_on": clone.leaving_on.isoformat() if clone and clone.leaving_on else None,
             "inviter": inviter.name if inviter else None}
 

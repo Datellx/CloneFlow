@@ -49,6 +49,8 @@ class Invite(Base):
     org_id: Mapped[int] = mapped_column(ForeignKey("orgs.id", ondelete="CASCADE"), index=True)
     email: Mapped[str] = mapped_column(String(320))
     role: Mapped[str] = mapped_column(String(20), default="member")
+    name: Mapped[str] = mapped_column(String(200), default="")
+    kind: Mapped[str] = mapped_column(String(20), default="handover")  # handover (leaving) | colleague (asks)
     code: Mapped[str] = mapped_column(String(64), unique=True, index=True)
     accepted: Mapped[bool] = mapped_column(Boolean, default=False)
     created_by: Mapped[int | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"))

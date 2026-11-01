@@ -55,7 +55,8 @@ def invite(db, org: Org, by: User, p: dict) -> dict:
               department=str(p.get("team") or "").strip()[:200], leaving_on=_date(p.get("leaving_on")),
               status="capturing", settings=st)
     db.add(c)
-    inv = Invite(org_id=org.id, email=email, role="member", code=secrets.token_urlsafe(18), created_by=by.id)
+    inv = Invite(org_id=org.id, email=email, role="member", name=name[:200], kind="handover",
+                 code=secrets.token_urlsafe(18), created_by=by.id)
     db.add(inv)
     db.commit()
     link = f"{settings.public_url.rstrip('/')}/join/{inv.code}"
@@ -64,3 +65,24 @@ def invite(db, org: Org, by: User, p: dict) -> dict:
     emailed = supabase.send_invite(email, link, {"invite_code": inv.code, "name": c.expert_name, "org_name": org.name,
                                                  "invited_by": by.name})
     return {"employee": core.employee_dict(db, c), "link": link, "emailed": emailed}
+
+
+def invite_colleague(db, org: Org, by: User, p: dict) -> dict:
+    """A colleague who stays: they sign in to ask the knowledge base (no handover, not counted on the plan)."""
+    email = str(p.get("email") or "").strip().lower()
+    name = str(p.get("name") or "").strip()
+    if "@" not in email or "." not in email.split("@")[-1] or not name:
+        raise InviteError("Enter the person's name and work email.")
+    if db.scalar(select(User).where(User.email == email)) or db.scalar(
+            select(Invite).where(Invite.email == email, Invite.org_id == org.id, Invite.accepted.is_(False))):
+        raise InviteError(f"{email} already has an invitation or an account.", 409)
+    inv = Invite(org_id=org.id, email=email, role="member", name=name[:200], kind="colleague",
+                 code=secrets.token_urlsafe(18), created_by=by.id)
+    db.add(inv)
+    db.commit()
+    link = f"{settings.public_url.rstrip('/')}/join/{inv.code}"
+    from backend.app import supabase
+
+    emailed = supabase.send_invite(email, link, {"invite_code": inv.code, "name": name, "org_name": org.name,
+                                                 "invited_by": by.name})
+    return {"id": inv.id, "name": name, "email": email, "link": link, "emailed": emailed}

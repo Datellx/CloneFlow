@@ -376,6 +376,7 @@ export function Join() {
 
   if (sentTo) return <CheckEmail email={sentTo} what="start your handover" />;
   const d = info.data;
+  const colleague = d.kind === "colleague";
   const first = (d.name || f.name).trim().split(/\s+/)[0];
   return (
     <CardFrame wide footer={<>Already have an account? <Link to="/login" className="font-medium text-brand-700 hover:underline">Sign in</Link></>}>
@@ -383,14 +384,25 @@ export function Join() {
         <div className="flex flex-col items-center bg-[linear-gradient(180deg,#FBF2F4_0%,#FFFFFF_100%)] px-6 pb-2 pt-8 text-center sm:px-9">
           <Orb size={92} state="idle" />
           <p className="mt-4 text-[13.5px] font-medium text-brand-800">{d.inviter ? `${d.inviter} at ${d.org_name} invited you` : `${d.org_name} invited you`}</p>
-          <h1 className="mt-2 text-balance text-[28px] font-normal leading-tight text-ink sm:text-[32px]">{first ? `Hi ${first}. ` : ""}Let's hand over what you know.</h1>
-          <p className="mt-2.5 max-w-[38ch] text-[14.5px] leading-relaxed text-ink-muted">
-            A 20-minute conversation with Clone Flow, so the people who stay can keep doing what you did.
-          </p>
-          <ul className="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-1.5 text-[12.5px] text-ink-soft">
-            <li className="inline-flex items-center gap-1.5"><Clock className="h-3.5 w-3.5 text-ink-muted" /> About 20 minutes</li>
-            <li className="inline-flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5 text-sure" /> Personal messages stay private</li>
-          </ul>
+          {colleague ? (
+            <>
+              <h1 className="mt-2 text-balance text-[28px] font-normal leading-tight text-ink sm:text-[32px]">{first ? `Hi ${first}. ` : ""}Ask what {d.org_name} knows.</h1>
+              <p className="mt-2.5 max-w-[38ch] text-[14.5px] leading-relaxed text-ink-muted">
+                Everything your colleagues handed over, answered with sources, on the web and in Teams.
+              </p>
+            </>
+          ) : (
+            <>
+              <h1 className="mt-2 text-balance text-[28px] font-normal leading-tight text-ink sm:text-[32px]">{first ? `Hi ${first}. ` : ""}Let's hand over what you know.</h1>
+              <p className="mt-2.5 max-w-[38ch] text-[14.5px] leading-relaxed text-ink-muted">
+                A 20-minute conversation with Clone Flow, so the people who stay can keep doing what you did.
+              </p>
+              <ul className="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-1.5 text-[12.5px] text-ink-soft">
+                <li className="inline-flex items-center gap-1.5"><Clock className="h-3.5 w-3.5 text-ink-muted" /> About 20 minutes</li>
+                <li className="inline-flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5 text-sure" /> Personal messages stay private</li>
+              </ul>
+            </>
+          )}
         </div>
         <form onSubmit={submit} className="space-y-4 px-6 pb-7 pt-6 sm:px-9">
           <Input id="name" label="Your name" value={f.name} onChange={set("name")} autoComplete="name" required />
@@ -401,12 +413,12 @@ export function Join() {
           )}
           <FormError msg={err} />
           <Button type="submit" size="lg" className="w-full !rounded-full" loading={loading}>
-            Start my handover {!loading && <ArrowRight className="h-4 w-4" />}
+            {colleague ? "Open Clone Flow" : "Start my handover"} {!loading && <ArrowRight className="h-4 w-4" />}
           </Button>
         </form>
       </div>
       <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-[12.5px] text-ink-faint">
-        <Check className="h-3.5 w-3.5" /> When you finish, what you share goes to {d.org_name}'s knowledge base.
+        <Check className="h-3.5 w-3.5" /> {colleague ? `Answers come only from what ${d.org_name}'s people handed over.` : `When you finish, what you share goes to ${d.org_name}'s knowledge base.`}
       </p>
     </CardFrame>
   );
