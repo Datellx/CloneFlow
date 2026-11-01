@@ -1,0 +1,1983 @@
+{
+ "export": "Teams-style channel export (synthetic demo data)",
+ "tenant": "Northwind Robotics",
+ "exported_at": "2026-10-29T09:00:00-05:00",
+ "channels": [
+  {
+   "id": "general",
+   "name": "general",
+   "kind": "channel",
+   "members": [
+    "Avery Brooks",
+    "Jordan Lee",
+    "Daniel Okafor",
+    "Robert Haines",
+    "Rosa Delgado",
+    "Tyler Brandt",
+    "Aisha Rahman",
+    "Priya Natarajan",
+    "Victor Nguyen",
+    "Ravi Iyer",
+    "Samir Haddad",
+    "Kevin Marsh",
+    "Owen Brooks",
+    "Grace Whitfield",
+    "Hannah Schultz",
+    "Jasmine Cole",
+    "Marcus Bell",
+    "Chloe Martin",
+    "Megan Fischer",
+    "Luis Ortega",
+    "Nina Pham",
+    "Ben Kowalski",
+    "Tom Reilly",
+    "Ethan Park",
+    "Linda Sorensen"
+   ],
+   "messages": [
+    {
+     "id": "msg-0198",
+     "thread_id": "general-t001",
+     "author": "Daniel Okafor",
+     "sent_at": "2025-03-10T09:05:00-05:00",
+     "text": "everyone please welcome Jordan Lee, new Robotics Engineer \ud83d\udc4b",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udc4b",
+       "count": 14
+      }
+     ]
+    },
+    {
+     "id": "msg-0199",
+     "thread_id": "general-t001",
+     "author": "Jordan Lee",
+     "sent_at": "2025-03-10T09:10:00-05:00",
+     "text": "thanks all! excited to be here",
+     "reactions": []
+    },
+    {
+     "id": "msg-0200",
+     "thread_id": "general-t002",
+     "author": "Megan Fischer",
+     "sent_at": "2025-12-12T12:00:00-06:00",
+     "text": "holiday party Friday Dec 19 at 4pm in the break room, ugly sweaters encouraged \ud83c\udf84",
+     "reactions": [
+      {
+       "emoji": "\ud83c\udf84",
+       "count": 11
+      },
+      {
+       "emoji": "\ud83d\ude02",
+       "count": 3
+      }
+     ]
+    },
+    {
+     "id": "msg-0201",
+     "thread_id": "general-t002",
+     "author": "Tyler Brandt",
+     "sent_at": "2025-12-12T12:05:00-06:00",
+     "text": "is there a prize for ugliest",
+     "reactions": []
+    },
+    {
+     "id": "msg-0202",
+     "thread_id": "general-t002",
+     "author": "Megan Fischer",
+     "sent_at": "2025-12-12T12:06:00-06:00",
+     "text": "yes \ud83c\udfc6",
+     "reactions": [
+      {
+       "emoji": "\ud83c\udf89",
+       "count": 4
+      }
+     ]
+    },
+    {
+     "id": "msg-0203",
+     "thread_id": "general-t003",
+     "author": "Megan Fischer",
+     "sent_at": "2026-07-02T15:30:00-05:00",
+     "text": "office closed Friday July 3 for the holiday. enjoy the long weekend! \ud83c\udf86",
+     "reactions": [
+      {
+       "emoji": "\ud83c\udf86",
+       "count": 9
+      }
+     ]
+    },
+    {
+     "id": "msg-0204",
+     "thread_id": "general-t003",
+     "author": "Rosa Delgado",
+     "sent_at": "2026-07-02T15:35:00-05:00",
+     "text": "line restarts Monday 7am as usual",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udc4d",
+       "count": 3
+      }
+     ]
+    },
+    {
+     "id": "msg-0205",
+     "thread_id": "general-t004",
+     "author": "Daniel Okafor",
+     "sent_at": "2026-10-06T09:05:00-05:00",
+     "text": "as you saw in email, Avery's last day is Nov 20. Jordan is taking over her projects",
+     "reactions": [
+      {
+       "emoji": "\ud83d\ude22",
+       "count": 12
+      }
+     ]
+    },
+    {
+     "id": "msg-0206",
+     "thread_id": "general-t004",
+     "author": "Rosa Delgado",
+     "sent_at": "2026-10-06T09:20:00-05:00",
+     "text": "noooo \ud83d\ude2d",
+     "reactions": [
+      {
+       "emoji": "\ud83d\ude2d",
+       "count": 5
+      }
+     ]
+    },
+    {
+     "id": "msg-0207",
+     "thread_id": "general-t004",
+     "author": "Avery Brooks",
+     "sent_at": "2026-10-06T09:31:00-05:00",
+     "text": "still here for 6 weeks, you're not rid of me yet \ud83d\ude04",
+     "reactions": [
+      {
+       "emoji": "\ud83d\ude02",
+       "count": 8
+      },
+      {
+       "emoji": "\u2764\ufe0f",
+       "count": 6
+      }
+     ]
+    },
+    {
+     "id": "msg-0208",
+     "thread_id": "general-t005",
+     "author": "Megan Fischer",
+     "sent_at": "2026-10-28T10:00:00-05:00",
+     "text": "farewell lunch for Avery on Nov 19, 12:00 at the Old Fashioned. reply here if you're coming \ud83c\udf54",
+     "reactions": [
+      {
+       "emoji": "\u2764\ufe0f",
+       "count": 10
+      }
+     ]
+    },
+    {
+     "id": "msg-0209",
+     "thread_id": "general-t005",
+     "author": "Tyler Brandt",
+     "sent_at": "2026-10-28T10:03:00-05:00",
+     "text": "in",
+     "reactions": []
+    },
+    {
+     "id": "msg-0210",
+     "thread_id": "general-t005",
+     "author": "Rosa Delgado",
+     "sent_at": "2026-10-28T10:04:00-05:00",
+     "text": "obviously",
+     "reactions": []
+    },
+    {
+     "id": "msg-0211",
+     "thread_id": "general-t005",
+     "author": "Jordan Lee",
+     "sent_at": "2026-10-28T10:10:00-05:00",
+     "text": "in \ud83d\ude42",
+     "reactions": []
+    }
+   ]
+  },
+  {
+   "id": "production-line2",
+   "name": "production-line2",
+   "kind": "channel",
+   "members": [
+    "Rosa Delgado",
+    "Tyler Brandt",
+    "Avery Brooks",
+    "Jordan Lee",
+    "Luis Ortega",
+    "Nina Pham",
+    "Ben Kowalski",
+    "Aisha Rahman",
+    "Owen Brooks",
+    "Tom Reilly"
+   ],
+   "messages": [
+    {
+     "id": "msg-0001",
+     "thread_id": "production-line2-t001",
+     "author": "Rosa Delgado",
+     "sent_at": "2024-07-17T07:52:00-05:00",
+     "text": "reminder: all arms go through bench 3 now before final test. jig is on Line 2, bench 3, printed procedure is taped to the shelf above it",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udc4d",
+       "count": 6
+      }
+     ]
+    },
+    {
+     "id": "msg-0002",
+     "thread_id": "production-line2-t001",
+     "author": "Luis Ortega",
+     "sent_at": "2024-07-17T07:55:00-05:00",
+     "text": "what if bench 3 is busy",
+     "reactions": []
+    },
+    {
+     "id": "msg-0003",
+     "thread_id": "production-line2-t001",
+     "author": "Avery Brooks",
+     "sent_at": "2024-07-17T07:58:00-05:00",
+     "text": "then they wait in the blue tray next to it, first in first out. calibration is ~5 min an arm so it shouldn't pile up",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udc4d",
+       "count": 3
+      }
+     ]
+    },
+    {
+     "id": "msg-0004",
+     "thread_id": "production-line2-t001",
+     "author": "Tyler Brandt",
+     "sent_at": "2024-07-17T08:03:00-05:00",
+     "text": "first one done in 4:50 incl. putting it on the jig \ud83d\udcaa",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udd25",
+       "count": 3
+      }
+     ]
+    },
+    {
+     "id": "msg-0005",
+     "thread_id": "production-line2-t001",
+     "author": "Rosa Delgado",
+     "sent_at": "2024-07-17T08:05:00-05:00",
+     "text": "that's faster than bench 1 ever was lol",
+     "reactions": []
+    },
+    {
+     "id": "msg-0006",
+     "thread_id": "production-line2-t002",
+     "author": "Ben Kowalski",
+     "sent_at": "2024-11-18T07:41:00-06:00",
+     "text": "is anyone calibrating yet? got 4 arms ready",
+     "reactions": []
+    },
+    {
+     "id": "msg-0007",
+     "thread_id": "production-line2-t002",
+     "author": "Rosa Delgado",
+     "sent_at": "2024-11-18T07:44:00-06:00",
+     "text": "not yet, Avery re-runs the wrist calibration every Monday first thing. give her 20 min",
+     "reactions": []
+    },
+    {
+     "id": "msg-0008",
+     "thread_id": "production-line2-t002",
+     "author": "Ben Kowalski",
+     "sent_at": "2024-11-18T07:46:00-06:00",
+     "text": "ah ok forgot it's monday",
+     "reactions": [
+      {
+       "emoji": "\ud83d\ude05",
+       "count": 2
+      }
+     ]
+    },
+    {
+     "id": "msg-0009",
+     "thread_id": "production-line2-t002",
+     "author": "Avery Brooks",
+     "sent_at": "2024-11-18T08:02:00-06:00",
+     "text": "bench 3 is free, go ahead Ben",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udc4d",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "id": "msg-0010",
+     "thread_id": "production-line2-t003",
+     "author": "Tyler Brandt",
+     "sent_at": "2025-01-13T07:38:00-06:00",
+     "text": "@Avery did you do the Monday recal yet? want to start the 0102 batch",
+     "reactions": []
+    },
+    {
+     "id": "msg-0011",
+     "thread_id": "production-line2-t003",
+     "author": "Avery Brooks",
+     "sent_at": "2025-01-13T07:51:00-06:00",
+     "text": "doing it now, 10 more min",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udc4d",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "id": "msg-0012",
+     "thread_id": "production-line2-t003",
+     "author": "Avery Brooks",
+     "sent_at": "2025-01-13T08:03:00-06:00",
+     "text": "done, bench 3 is all yours",
+     "reactions": [
+      {
+       "emoji": "\ud83d\ude4f",
+       "count": 2
+      }
+     ]
+    },
+    {
+     "id": "msg-0013",
+     "thread_id": "production-line2-t004",
+     "author": "Jordan Lee",
+     "sent_at": "2025-03-24T09:12:00-05:00",
+     "text": "dumb question, the reference arm on bench 3, are we allowed to move it?",
+     "reactions": []
+    },
+    {
+     "id": "msg-0014",
+     "thread_id": "production-line2-t004",
+     "author": "Tyler Brandt",
+     "sent_at": "2025-03-24T09:14:00-05:00",
+     "text": "not a dumb question. NO \ud83d\ude02 it lives on the dowels and nobody touches it except Avery",
+     "reactions": [
+      {
+       "emoji": "\ud83d\ude02",
+       "count": 4
+      }
+     ]
+    },
+    {
+     "id": "msg-0015",
+     "thread_id": "production-line2-t004",
+     "author": "Avery Brooks",
+     "sent_at": "2025-03-24T09:15:00-05:00",
+     "text": "what tyler said. if it gets bumped tell me and I'll re-check it against the dial indicators",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udc4d",
+       "count": 2
+      }
+     ]
+    },
+    {
+     "id": "msg-0016",
+     "thread_id": "production-line2-t004",
+     "author": "Jordan Lee",
+     "sent_at": "2025-03-24T09:20:00-05:00",
+     "text": "noted. reference arm = sacred \ud83d\ude4f",
+     "reactions": [
+      {
+       "emoji": "\ud83d\ude02",
+       "count": 3
+      }
+     ]
+    },
+    {
+     "id": "msg-0017",
+     "thread_id": "production-line2-t005",
+     "author": "Nina Pham",
+     "sent_at": "2025-04-07T07:40:00-05:00",
+     "text": "bench 3 locked out?",
+     "reactions": []
+    },
+    {
+     "id": "msg-0018",
+     "thread_id": "production-line2-t005",
+     "author": "Rosa Delgado",
+     "sent_at": "2025-04-07T07:41:00-05:00",
+     "text": "monday recal, avery's on it",
+     "reactions": []
+    },
+    {
+     "id": "msg-0019",
+     "thread_id": "production-line2-t005",
+     "author": "Nina Pham",
+     "sent_at": "2025-04-07T07:42:00-05:00",
+     "text": "right right",
+     "reactions": []
+    },
+    {
+     "id": "msg-0020",
+     "thread_id": "production-line2-t006",
+     "author": "Rosa Delgado",
+     "sent_at": "2025-06-12T13:30:00-05:00",
+     "text": "new laminated shipping checklist is on the packing table. Owen initials every box from today",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udc4d",
+       "count": 5
+      },
+      {
+       "emoji": "\ud83c\udf89",
+       "count": 2
+      }
+     ]
+    },
+    {
+     "id": "msg-0021",
+     "thread_id": "production-line2-t006",
+     "author": "Owen Brooks",
+     "sent_at": "2025-06-12T13:34:00-05:00",
+     "text": "initialing like a pro \u270d\ufe0f",
+     "reactions": [
+      {
+       "emoji": "\ud83d\ude02",
+       "count": 3
+      }
+     ]
+    },
+    {
+     "id": "msg-0022",
+     "thread_id": "production-line2-t007",
+     "author": "Tom Reilly",
+     "sent_at": "2025-08-19T10:05:00-05:00",
+     "text": "arm 0274 calibrated with wrist_roll way off, like upside down??",
+     "reactions": []
+    },
+    {
+     "id": "msg-0023",
+     "thread_id": "production-line2-t007",
+     "author": "Rosa Delgado",
+     "sent_at": "2025-08-19T10:07:00-05:00",
+     "text": "did you do the thing with the wrist first?",
+     "reactions": []
+    },
+    {
+     "id": "msg-0024",
+     "thread_id": "production-line2-t007",
+     "author": "Tom Reilly",
+     "sent_at": "2025-08-19T10:09:00-05:00",
+     "text": "...no \ud83e\udd26 redoing",
+     "reactions": [
+      {
+       "emoji": "\ud83d\ude02",
+       "count": 2
+      }
+     ]
+    },
+    {
+     "id": "msg-0025",
+     "thread_id": "production-line2-t007",
+     "author": "Tom Reilly",
+     "sent_at": "2025-08-19T10:21:00-05:00",
+     "text": "passed",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udc4d",
+       "count": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "gripper-v2",
+   "name": "gripper-v2",
+   "kind": "channel",
+   "members": [
+    "Avery Brooks",
+    "Jordan Lee",
+    "Priya Natarajan",
+    "Daniel Okafor",
+    "Rosa Delgado",
+    "Samir Haddad"
+   ],
+   "messages": [
+    {
+     "id": "msg-0086",
+     "thread_id": "gripper-v2-t001",
+     "author": "Avery Brooks",
+     "sent_at": "2026-06-09T09:20:00-05:00",
+     "text": "channel for Gripper v2. kickoff email went out this morning, three parts: PETG-CF jaw, aluminum horn adapter, lower current limit in firmware",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udc4d",
+       "count": 4
+      }
+     ]
+    },
+    {
+     "id": "msg-0087",
+     "thread_id": "gripper-v2-t001",
+     "author": "Samir Haddad",
+     "sent_at": "2026-06-09T09:22:00-05:00",
+     "text": "I can help with the jaw geometry, the root fillet on v1 is tiny",
+     "reactions": []
+    },
+    {
+     "id": "msg-0088",
+     "thread_id": "gripper-v2-t001",
+     "author": "Avery Brooks",
+     "sent_at": "2026-06-09T09:25:00-05:00",
+     "text": "yes please! 6 mm root and whatever fillet you think",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udc4d",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "id": "msg-0089",
+     "thread_id": "gripper-v2-t001",
+     "author": "Jordan Lee",
+     "sent_at": "2026-06-09T09:31:00-05:00",
+     "text": "I'll own the load testing, rig on bench 2",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udc4d",
+       "count": 2
+      }
+     ]
+    },
+    {
+     "id": "msg-0090",
+     "thread_id": "gripper-v2-t001",
+     "author": "Rosa Delgado",
+     "sent_at": "2026-06-09T09:40:00-05:00",
+     "text": "any impact on the line for now?",
+     "reactions": []
+    },
+    {
+     "id": "msg-0091",
+     "thread_id": "gripper-v2-t001",
+     "author": "Avery Brooks",
+     "sent_at": "2026-06-09T09:44:00-05:00",
+     "text": "nothing until the changeover, probably December",
+     "reactions": []
+    },
+    {
+     "id": "msg-0092",
+     "thread_id": "gripper-v2-t002",
+     "author": "Samir Haddad",
+     "sent_at": "2026-06-23T16:02:00-05:00",
+     "text": "v2 jaw STLs in gripper_v2/cad, root is 6 mm with a 2 mm fillet",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udd25",
+       "count": 2
+      }
+     ]
+    },
+    {
+     "id": "msg-0093",
+     "thread_id": "gripper-v2-t002",
+     "author": "Jordan Lee",
+     "sent_at": "2026-06-23T16:10:00-05:00",
+     "text": "nice, printing two on the office printer in PLA for fit before we order PETG-CF",
+     "reactions": []
+    },
+    {
+     "id": "msg-0094",
+     "thread_id": "gripper-v2-t002",
+     "author": "Jordan Lee",
+     "sent_at": "2026-06-23T17:30:00-05:00",
+     "text": "PLA test prints fit fine on the current servo, sending Abby the STLs",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udc4d",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "id": "msg-0095",
+     "thread_id": "gripper-v2-t003",
+     "author": "Jordan Lee",
+     "sent_at": "2026-07-14T15:40:00-05:00",
+     "text": "v1 jaws crack around 31 N. v2 PETG-CF hasn't broken at 60 N, the fixture tops out there \ud83d\ude02",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udd25",
+       "count": 3
+      }
+     ]
+    },
+    {
+     "id": "msg-0096",
+     "thread_id": "gripper-v2-t003",
+     "author": "Jordan Lee",
+     "sent_at": "2026-07-14T15:42:00-05:00",
+     "text": "BUT the plastic horn slips at ~40 N with the v2 jaw",
+     "reactions": []
+    },
+    {
+     "id": "msg-0097",
+     "thread_id": "gripper-v2-t003",
+     "author": "Avery Brooks",
+     "sent_at": "2026-07-14T15:44:00-05:00",
+     "text": "figured. that's why the horn adapter is in scope",
+     "reactions": []
+    },
+    {
+     "id": "msg-0098",
+     "thread_id": "gripper-v2-t003",
+     "author": "Samir Haddad",
+     "sent_at": "2026-07-14T15:50:00-05:00",
+     "text": "what's the failure mode on the horn? spline teeth shearing?",
+     "reactions": []
+    },
+    {
+     "id": "msg-0099",
+     "thread_id": "gripper-v2-t003",
+     "author": "Jordan Lee",
+     "sent_at": "2026-07-14T15:58:00-05:00",
+     "text": "yeah, teeth on the plastic horn get rounded off, the servo output spline is fine",
+     "reactions": []
+    },
+    {
+     "id": "msg-0100",
+     "thread_id": "gripper-v2-t003",
+     "author": "Samir Haddad",
+     "sent_at": "2026-07-14T16:05:00-05:00",
+     "text": "ok so the aluminum adapter makes total sense",
+     "reactions": []
+    },
+    {
+     "id": "msg-0101",
+     "thread_id": "gripper-v2-t004",
+     "author": "Jordan Lee",
+     "sent_at": "2026-07-21T10:30:00-05:00",
+     "text": "10 min stall test at current limit 230: servo case got to 52\u00b0C. at default it hit 71\u00b0C and smelled hot",
+     "reactions": [
+      {
+       "emoji": "\ud83d\ude2c",
+       "count": 2
+      }
+     ]
+    },
+    {
+     "id": "msg-0102",
+     "thread_id": "gripper-v2-t004",
+     "author": "Avery Brooks",
+     "sent_at": "2026-07-21T10:33:00-05:00",
+     "text": "good data. 230 is my front runner but I want the 8h hold before committing",
+     "reactions": []
+    },
+    {
+     "id": "msg-0103",
+     "thread_id": "gripper-v2-t004",
+     "author": "Priya Natarajan",
+     "sent_at": "2026-07-21T10:35:00-05:00",
+     "text": "agree, 10 min isn't enough to say it won't drift up",
+     "reactions": []
+    },
+    {
+     "id": "msg-0104",
+     "thread_id": "gripper-v2-t005",
+     "author": "Jordan Lee",
+     "sent_at": "2026-08-12T13:15:00-05:00",
+     "text": "Novak first articles arrived. 18/20 slide on nicely, 2 are tight on the spline",
+     "reactions": []
+    },
+    {
+     "id": "msg-0105",
+     "thread_id": "gripper-v2-t005",
+     "author": "Avery Brooks",
+     "sent_at": "2026-08-12T13:20:00-05:00",
+     "text": "tight is ok if they go on by hand without a mallet. if you need a mallet send them back to Gus",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udc4d",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "id": "msg-0106",
+     "thread_id": "gripper-v2-t005",
+     "author": "Jordan Lee",
+     "sent_at": "2026-08-12T13:44:00-05:00",
+     "text": "both needed a mallet. sending back",
+     "reactions": []
+    },
+    {
+     "id": "msg-0107",
+     "thread_id": "gripper-v2-t005",
+     "author": "Avery Brooks",
+     "sent_at": "2026-08-12T13:50:00-05:00",
+     "text": "\ud83d\udc4d tell Gus which two, he'll want the serial on the bag",
+     "reactions": []
+    },
+    {
+     "id": "msg-0108",
+     "thread_id": "gripper-v2-t006",
+     "author": "Avery Brooks",
+     "sent_at": "2026-08-19T16:00:00-05:00",
+     "text": "design review notes are in gripper_v2/design_review_2026-08.md. all three changes approved, firmware value TBD",
+     "reactions": [
+      {
+       "emoji": "\ud83c\udf89",
+       "count": 5
+      }
+     ]
+    },
+    {
+     "id": "msg-0109",
+     "thread_id": "gripper-v2-t006",
+     "author": "Daniel Okafor",
+     "sent_at": "2026-08-19T16:03:00-05:00",
+     "text": "nice work team",
+     "reactions": []
+    },
+    {
+     "id": "msg-0110",
+     "thread_id": "gripper-v2-t007",
+     "author": "Rosa Delgado",
+     "sent_at": "2026-08-20T09:15:00-05:00",
+     "text": "for the horn adapter, what torque on the screw? same as the plastic horns?",
+     "reactions": []
+    }
+   ]
+  },
+  {
+   "id": "firmware",
+   "name": "firmware",
+   "kind": "channel",
+   "members": [
+    "Priya Natarajan",
+    "Avery Brooks",
+    "Jordan Lee",
+    "Victor Nguyen",
+    "Daniel Okafor",
+    "Ravi Iyer",
+    "Ethan Park"
+   ],
+   "messages": [
+    {
+     "id": "msg-0124",
+     "thread_id": "firmware-t001",
+     "author": "Ethan Park",
+     "sent_at": "2024-05-02T11:20:00-05:00",
+     "text": "added a so101_12v profile to arm-config, uses the same calibration flow, just different voltage limits",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udc4d",
+       "count": 2
+      }
+     ]
+    },
+    {
+     "id": "msg-0125",
+     "thread_id": "firmware-t001",
+     "author": "Avery Brooks",
+     "sent_at": "2024-05-02T11:25:00-05:00",
+     "text": "perfect, I'll use it for the station laptop",
+     "reactions": []
+    },
+    {
+     "id": "msg-0126",
+     "thread_id": "firmware-t001",
+     "author": "Daniel Okafor",
+     "sent_at": "2024-05-02T11:40:00-05:00",
+     "text": "nice, does that cover the 7.4V hobby kit too?",
+     "reactions": []
+    },
+    {
+     "id": "msg-0127",
+     "thread_id": "firmware-t001",
+     "author": "Ethan Park",
+     "sent_at": "2024-05-02T11:44:00-05:00",
+     "text": "no, that stays on the default so101 profile",
+     "reactions": []
+    },
+    {
+     "id": "msg-0130",
+     "thread_id": "firmware-t003",
+     "author": "Jordan Lee",
+     "sent_at": "2025-03-26T10:05:00-05:00",
+     "text": "hi, setting up LeRobot on my laptop. which python version are we on?",
+     "reactions": []
+    },
+    {
+     "id": "msg-0131",
+     "thread_id": "firmware-t003",
+     "author": "Victor Nguyen",
+     "sent_at": "2025-03-26T10:09:00-05:00",
+     "text": "3.10, use the env file in arm-config/env. lerobot is pinned",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udc4d",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "id": "msg-0132",
+     "thread_id": "firmware-t003",
+     "author": "Jordan Lee",
+     "sent_at": "2025-03-26T10:20:00-05:00",
+     "text": "got it running, teleop with the leader arm works \ud83c\udf89",
+     "reactions": [
+      {
+       "emoji": "\ud83c\udf89",
+       "count": 3
+      }
+     ]
+    },
+    {
+     "id": "msg-0133",
+     "thread_id": "firmware-t003",
+     "author": "Avery Brooks",
+     "sent_at": "2025-03-26T10:22:00-05:00",
+     "text": "nice!! now try not to calibrate on a monday \ud83d\ude04",
+     "reactions": [
+      {
+       "emoji": "\ud83d\ude02",
+       "count": 2
+      }
+     ]
+    },
+    {
+     "id": "msg-0134",
+     "thread_id": "firmware-t003",
+     "author": "Jordan Lee",
+     "sent_at": "2025-03-26T10:23:00-05:00",
+     "text": "?",
+     "reactions": []
+    },
+    {
+     "id": "msg-0135",
+     "thread_id": "firmware-t003",
+     "author": "Avery Brooks",
+     "sent_at": "2025-03-26T10:25:00-05:00",
+     "text": "long story, I'll show you",
+     "reactions": []
+    },
+    {
+     "id": "msg-0128",
+     "thread_id": "firmware-t002",
+     "author": "Ethan Park",
+     "sent_at": "2025-04-29T16:40:00-05:00",
+     "text": "last day tomorrow \ud83d\udc4b arm-config README is up to date. ping Priya for anything after",
+     "reactions": [
+      {
+       "emoji": "\ud83d\ude22",
+       "count": 5
+      },
+      {
+       "emoji": "\ud83d\udc4b",
+       "count": 4
+      }
+     ]
+    },
+    {
+     "id": "msg-0129",
+     "thread_id": "firmware-t002",
+     "author": "Priya Natarajan",
+     "sent_at": "2025-04-29T16:42:00-05:00",
+     "text": "we'll keep the lights on",
+     "reactions": []
+    },
+    {
+     "id": "msg-0148",
+     "thread_id": "firmware-t008",
+     "author": "Ravi Iyer",
+     "sent_at": "2026-01-21T14:15:00-06:00",
+     "text": "the bench 3 driver board is the Waveshare one right? want to swap the USB cable, it's flaky",
+     "reactions": []
+    },
+    {
+     "id": "msg-0149",
+     "thread_id": "firmware-t008",
+     "author": "Avery Brooks",
+     "sent_at": "2026-01-21T14:17:00-06:00",
+     "text": "yes, and use the short shielded cable in the drawer, the long ones drop packets",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udc4d",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "id": "msg-0136",
+     "thread_id": "firmware-t004",
+     "author": "Priya Natarajan",
+     "sent_at": "2026-06-10T10:00:00-05:00",
+     "text": "created gripper_v2 profile stub in arm-config so Avery can fill it in",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udc4d",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "id": "msg-0137",
+     "thread_id": "firmware-t004",
+     "author": "Avery Brooks",
+     "sent_at": "2026-06-10T10:20:00-05:00",
+     "text": "thanks! I'll branch off it: mr/gripper-v2-current-limit",
+     "reactions": []
+    },
+    {
+     "id": "msg-0138",
+     "thread_id": "firmware-t004",
+     "author": "Priya Natarajan",
+     "sent_at": "2026-06-10T10:25:00-05:00",
+     "text": "\ud83d\udc4d keep the v1 gripper profile untouched pls, field arms",
+     "reactions": []
+    },
+    {
+     "id": "msg-0139",
+     "thread_id": "firmware-t004",
+     "author": "Avery Brooks",
+     "sent_at": "2026-06-10T10:27:00-05:00",
+     "text": "yep, v2 only",
+     "reactions": []
+    },
+    {
+     "id": "msg-0140",
+     "thread_id": "firmware-t005",
+     "author": "Avery Brooks",
+     "sent_at": "2026-09-29T17:20:00-05:00",
+     "text": "opened PR #142 as draft. gripper_v2 profile with lower Protection_Current + overload handling. current limit value is a placeholder",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udc40",
+       "count": 2
+      }
+     ]
+    },
+    {
+     "id": "msg-0141",
+     "thread_id": "firmware-t005",
+     "author": "Priya Natarajan",
+     "sent_at": "2026-09-29T17:35:00-05:00",
+     "text": "cool, will look once it's out of draft",
+     "reactions": []
+    },
+    {
+     "id": "msg-0142",
+     "thread_id": "firmware-t006",
+     "author": "Priya Natarajan",
+     "sent_at": "2026-10-09T11:45:00-05:00",
+     "text": "is #142 still draft?",
+     "reactions": []
+    },
+    {
+     "id": "msg-0143",
+     "thread_id": "firmware-t006",
+     "author": "Avery Brooks",
+     "sent_at": "2026-10-09T11:58:00-05:00",
+     "text": "yeah almost done, just the current limit tuning on the v2 jaw. will finish before i leave \ud83e\udd1e",
+     "reactions": [
+      {
+       "emoji": "\ud83e\udd1e",
+       "count": 3
+      }
+     ]
+    },
+    {
+     "id": "msg-0144",
+     "thread_id": "firmware-t006",
+     "author": "Priya Natarajan",
+     "sent_at": "2026-10-09T12:05:00-05:00",
+     "text": "ok, ping me when it's ready. I'd like the hold test temp log attached",
+     "reactions": []
+    },
+    {
+     "id": "msg-0145",
+     "thread_id": "firmware-t006",
+     "author": "Jordan Lee",
+     "sent_at": "2026-10-09T12:10:00-05:00",
+     "text": "following this one \ud83d\udc40",
+     "reactions": []
+    },
+    {
+     "id": "msg-0146",
+     "thread_id": "firmware-t007",
+     "author": "Victor Nguyen",
+     "sent_at": "2026-10-16T09:40:00-05:00",
+     "text": "FYI CI on #142 is red, looks like a lint error in profiles.yaml, nothing serious",
+     "reactions": []
+    }
+   ]
+  },
+  {
+   "id": "suppliers",
+   "name": "suppliers",
+   "kind": "channel",
+   "members": [
+    "Kevin Marsh",
+    "Avery Brooks",
+    "Rosa Delgado",
+    "Daniel Okafor",
+    "Owen Brooks",
+    "Tyler Brandt"
+   ],
+   "messages": [
+    {
+     "id": "msg-0150",
+     "thread_id": "suppliers-t001",
+     "author": "Kevin Marsh",
+     "sent_at": "2025-11-04T10:15:00-06:00",
+     "text": "STS3215 stock check: 320 12V on hand, 80 7.4V. next Kaihong shipment Nov 18",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udc4d",
+       "count": 2
+      }
+     ]
+    },
+    {
+     "id": "msg-0151",
+     "thread_id": "suppliers-t001",
+     "author": "Avery Brooks",
+     "sent_at": "2025-11-04T10:20:00-06:00",
+     "text": "\ud83d\udc4d that covers us till the shipment",
+     "reactions": []
+    },
+    {
+     "id": "msg-0152",
+     "thread_id": "suppliers-t001",
+     "author": "Rosa Delgado",
+     "sent_at": "2025-11-04T10:31:00-06:00",
+     "text": "can we get more 7.4V? hobby kit orders are up for the holidays",
+     "reactions": []
+    },
+    {
+     "id": "msg-0153",
+     "thread_id": "suppliers-t001",
+     "author": "Kevin Marsh",
+     "sent_at": "2025-11-04T10:40:00-06:00",
+     "text": "adding 100 to the next order",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udc4d",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "id": "msg-0173",
+     "thread_id": "suppliers-t008",
+     "author": "Owen Brooks",
+     "sent_at": "2026-03-11T09:40:00-05:00",
+     "text": "Printwell delivery here, 2 boxes of wrist housings. where do they go?",
+     "reactions": []
+    },
+    {
+     "id": "msg-0174",
+     "thread_id": "suppliers-t008",
+     "author": "Rosa Delgado",
+     "sent_at": "2026-03-11T09:42:00-05:00",
+     "text": "shelf B2 in the printed parts area",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udc4d",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "id": "msg-0154",
+     "thread_id": "suppliers-t002",
+     "author": "Kevin Marsh",
+     "sent_at": "2026-05-06T09:00:00-05:00",
+     "text": "heard there's a bad servo lot? anything I need to do on the PO side?",
+     "reactions": []
+    },
+    {
+     "id": "msg-0155",
+     "thread_id": "suppliers-t002",
+     "author": "Avery Brooks",
+     "sent_at": "2026-05-06T09:10:00-05:00",
+     "text": "lot A2318, 14 bad units. I've got it with Kaihong, RMA is going through me. nothing needed from you yet",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udc4d",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "id": "msg-0156",
+     "thread_id": "suppliers-t002",
+     "author": "Daniel Okafor",
+     "sent_at": "2026-05-06T09:15:00-05:00",
+     "text": "do we need to stop shipping anything?",
+     "reactions": []
+    },
+    {
+     "id": "msg-0157",
+     "thread_id": "suppliers-t002",
+     "author": "Avery Brooks",
+     "sent_at": "2026-05-06T09:22:00-05:00",
+     "text": "no, everything that shipped passed calibration. only the remaining stock is held",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udc4d",
+       "count": 2
+      }
+     ]
+    },
+    {
+     "id": "msg-0158",
+     "thread_id": "suppliers-t003",
+     "author": "Kevin Marsh",
+     "sent_at": "2026-05-14T13:30:00-05:00",
+     "text": "who's our actual contact at Kaihong btw? I only ever have sales@",
+     "reactions": []
+    },
+    {
+     "id": "msg-0159",
+     "thread_id": "suppliers-t003",
+     "author": "Avery Brooks",
+     "sent_at": "2026-05-14T13:41:00-05:00",
+     "text": "I deal with Wei directly, he's the one who actually gets things done with the factory. I'll intro you at some point",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udc4d",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "id": "msg-0160",
+     "thread_id": "suppliers-t003",
+     "author": "Kevin Marsh",
+     "sent_at": "2026-05-14T13:42:00-05:00",
+     "text": "\ud83d\udc4d",
+     "reactions": []
+    },
+    {
+     "id": "msg-0161",
+     "thread_id": "suppliers-t003",
+     "author": "Daniel Okafor",
+     "sent_at": "2026-05-14T13:50:00-05:00",
+     "text": "might be worth getting that intro done sooner rather than later",
+     "reactions": []
+    },
+    {
+     "id": "msg-0162",
+     "thread_id": "suppliers-t003",
+     "author": "Avery Brooks",
+     "sent_at": "2026-05-14T13:55:00-05:00",
+     "text": "agreed, will do",
+     "reactions": []
+    },
+    {
+     "id": "msg-0163",
+     "thread_id": "suppliers-t004",
+     "author": "Tyler Brandt",
+     "sent_at": "2026-05-27T11:05:00-05:00",
+     "text": "A2402 replacements passed incoming. all 14 under 0.5 deg",
+     "reactions": [
+      {
+       "emoji": "\ud83c\udf89",
+       "count": 3
+      }
+     ]
+    },
+    {
+     "id": "msg-0164",
+     "thread_id": "suppliers-t004",
+     "author": "Avery Brooks",
+     "sent_at": "2026-05-27T11:07:00-05:00",
+     "text": "\ud83d\ude4c thanks Tyler",
+     "reactions": []
+    },
+    {
+     "id": "msg-0165",
+     "thread_id": "suppliers-t005",
+     "author": "Kevin Marsh",
+     "sent_at": "2026-06-17T15:20:00-05:00",
+     "text": "Ridgeline samples landed, 20 pcs, two lots",
+     "reactions": []
+    },
+    {
+     "id": "msg-0166",
+     "thread_id": "suppliers-t005",
+     "author": "Avery Brooks",
+     "sent_at": "2026-06-17T15:24:00-05:00",
+     "text": "great, putting them on the bench tomorrow",
+     "reactions": []
+    },
+    {
+     "id": "msg-0167",
+     "thread_id": "suppliers-t005",
+     "author": "Rosa Delgado",
+     "sent_at": "2026-06-17T15:30:00-05:00",
+     "text": "can they go in the orange bin until you're done? don't want them mixed into stock",
+     "reactions": []
+    },
+    {
+     "id": "msg-0168",
+     "thread_id": "suppliers-t005",
+     "author": "Avery Brooks",
+     "sent_at": "2026-06-17T15:31:00-05:00",
+     "text": "yes good call",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udc4d",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "id": "msg-0169",
+     "thread_id": "suppliers-t006",
+     "author": "Kevin Marsh",
+     "sent_at": "2026-09-08T13:30:00-05:00",
+     "text": "Ridgeline PO approved by Daniel (over 5k so it went to him). ETA Oct 20",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udc4d",
+       "count": 3
+      }
+     ]
+    },
+    {
+     "id": "msg-0170",
+     "thread_id": "suppliers-t007",
+     "author": "Kevin Marsh",
+     "sent_at": "2026-10-15T10:00:00-05:00",
+     "text": "@Avery before you go, can you send me Wei's direct contact + anything I should know about how you work with Kaihong?",
+     "reactions": []
+    },
+    {
+     "id": "msg-0171",
+     "thread_id": "suppliers-t007",
+     "author": "Avery Brooks",
+     "sent_at": "2026-10-15T10:30:00-05:00",
+     "text": "yes, will do, adding it to my handover list",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udc4d",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "id": "msg-0172",
+     "thread_id": "suppliers-t007",
+     "author": "Kevin Marsh",
+     "sent_at": "2026-10-15T10:35:00-05:00",
+     "text": "thanks. mostly worried about the next bad lot, I wouldn't even know who to call",
+     "reactions": []
+    }
+   ]
+  },
+  {
+   "id": "university-pilot",
+   "name": "university-pilot",
+   "kind": "channel",
+   "members": [
+    "Hannah Schultz",
+    "Marcus Bell",
+    "Avery Brooks",
+    "Jordan Lee",
+    "Jasmine Cole"
+   ],
+   "messages": [
+    {
+     "id": "msg-0175",
+     "thread_id": "university-pilot-t001",
+     "author": "Hannah Schultz",
+     "sent_at": "2026-01-28T10:00:00-06:00",
+     "text": "Driftless State signed! 10 arms + 2 spares, delivery Feb 9, SLA 12 months from delivery",
+     "reactions": [
+      {
+       "emoji": "\ud83c\udf89",
+       "count": 6
+      }
+     ]
+    },
+    {
+     "id": "msg-0176",
+     "thread_id": "university-pilot-t001",
+     "author": "Marcus Bell",
+     "sent_at": "2026-01-28T10:03:00-06:00",
+     "text": "\ud83c\udf89\ud83c\udf89",
+     "reactions": []
+    },
+    {
+     "id": "msg-0177",
+     "thread_id": "university-pilot-t001",
+     "author": "Avery Brooks",
+     "sent_at": "2026-01-28T10:05:00-06:00",
+     "text": "arms are labelled DSU-01..10 + DSU-S1, DSU-S2. I'll drive them over",
+     "reactions": []
+    },
+    {
+     "id": "msg-0178",
+     "thread_id": "university-pilot-t001",
+     "author": "Jordan Lee",
+     "sent_at": "2026-01-28T10:10:00-06:00",
+     "text": "need help loading the van?",
+     "reactions": []
+    },
+    {
+     "id": "msg-0179",
+     "thread_id": "university-pilot-t001",
+     "author": "Avery Brooks",
+     "sent_at": "2026-01-28T10:12:00-06:00",
+     "text": "yes please! 9am on the 9th",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udc4d",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "id": "msg-0180",
+     "thread_id": "university-pilot-t002",
+     "author": "Avery Brooks",
+     "sent_at": "2026-02-09T17:30:00-06:00",
+     "text": "all 10 set up and checked at Driftless, TAs trained on calibration. lab is room B114",
+     "reactions": [
+      {
+       "emoji": "\ud83c\udf89",
+       "count": 5
+      }
+     ]
+    },
+    {
+     "id": "msg-0181",
+     "thread_id": "university-pilot-t002",
+     "author": "Hannah Schultz",
+     "sent_at": "2026-02-09T17:34:00-06:00",
+     "text": "amazing \ud83d\ude4c",
+     "reactions": []
+    },
+    {
+     "id": "msg-0182",
+     "thread_id": "university-pilot-t003",
+     "author": "Hannah Schultz",
+     "sent_at": "2026-03-04T10:12:00-06:00",
+     "text": "DSU-07 down, wrist roll not responding. Ines CC'd Avery",
+     "reactions": []
+    },
+    {
+     "id": "msg-0183",
+     "thread_id": "university-pilot-t003",
+     "author": "Avery Brooks",
+     "sent_at": "2026-03-04T10:55:00-06:00",
+     "text": "replied, probably the cable. if not we replace within the 5 business days",
+     "reactions": []
+    },
+    {
+     "id": "msg-0184",
+     "thread_id": "university-pilot-t003",
+     "author": "Avery Brooks",
+     "sent_at": "2026-03-04T15:15:00-06:00",
+     "text": "cracked connector on the servo. shipping a new wrist roll servo + cable",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udc4d",
+       "count": 2
+      }
+     ]
+    },
+    {
+     "id": "msg-0185",
+     "thread_id": "university-pilot-t003",
+     "author": "Hannah Schultz",
+     "sent_at": "2026-03-04T15:20:00-06:00",
+     "text": "I'll send Ines the shipping confirmation once Owen has the tracking",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udc4d",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "id": "msg-0196",
+     "thread_id": "university-pilot-t006",
+     "author": "Jasmine Cole",
+     "sent_at": "2026-04-15T13:00:00-05:00",
+     "text": "Driftless TA emailed support asking where the calibration files are stored on the lab PCs",
+     "reactions": []
+    },
+    {
+     "id": "msg-0197",
+     "thread_id": "university-pilot-t006",
+     "author": "Avery Brooks",
+     "sent_at": "2026-04-15T13:06:00-05:00",
+     "text": "~/.cache/huggingface/lerobot/calibration/robots/so101_follower/<arm id>.json. tell them to back that folder up",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udc4d",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "id": "msg-0186",
+     "thread_id": "university-pilot-t004",
+     "author": "Hannah Schultz",
+     "sent_at": "2026-09-17T11:40:00-05:00",
+     "text": "Ines says 3 grippers cracked at the jaw root + TAs recalibrate on Mondays a lot",
+     "reactions": []
+    },
+    {
+     "id": "msg-0187",
+     "thread_id": "university-pilot-t004",
+     "author": "Avery Brooks",
+     "sent_at": "2026-09-17T11:45:00-05:00",
+     "text": "grippers -> v2 jaws in Dec, free. mondays -> totally normal, same thing happens here",
+     "reactions": []
+    },
+    {
+     "id": "msg-0188",
+     "thread_id": "university-pilot-t004",
+     "author": "Jordan Lee",
+     "sent_at": "2026-09-17T11:47:00-05:00",
+     "text": "is the monday thing the same as our monday recal?",
+     "reactions": []
+    },
+    {
+     "id": "msg-0189",
+     "thread_id": "university-pilot-t004",
+     "author": "Avery Brooks",
+     "sent_at": "2026-09-17T11:52:00-05:00",
+     "text": "same thing yeah. I'll explain properly at some point",
+     "reactions": []
+    },
+    {
+     "id": "msg-0190",
+     "thread_id": "university-pilot-t004",
+     "author": "Hannah Schultz",
+     "sent_at": "2026-09-17T12:00:00-05:00",
+     "text": "can you send me something I can forward to Ines about the mondays?",
+     "reactions": []
+    },
+    {
+     "id": "msg-0191",
+     "thread_id": "university-pilot-t004",
+     "author": "Avery Brooks",
+     "sent_at": "2026-09-17T12:15:00-05:00",
+     "text": "yep, I'll write a short note",
+     "reactions": []
+    },
+    {
+     "id": "msg-0192",
+     "thread_id": "university-pilot-t005",
+     "author": "Marcus Bell",
+     "sent_at": "2026-10-21T15:10:00-05:00",
+     "text": "Driftless wants 4 more arms for spring \ud83c\udf89 with gripper v2",
+     "reactions": [
+      {
+       "emoji": "\ud83c\udf89",
+       "count": 4
+      }
+     ]
+    },
+    {
+     "id": "msg-0193",
+     "thread_id": "university-pilot-t005",
+     "author": "Hannah Schultz",
+     "sent_at": "2026-10-21T15:13:00-05:00",
+     "text": "and under the same SLA, I'll draft an amendment",
+     "reactions": []
+    },
+    {
+     "id": "msg-0194",
+     "thread_id": "university-pilot-t005",
+     "author": "Jordan Lee",
+     "sent_at": "2026-10-21T15:20:00-05:00",
+     "text": "that's 4 more arms through bench 3 in Dec, right in the middle of the changeover \ud83d\ude05",
+     "reactions": []
+    },
+    {
+     "id": "msg-0195",
+     "thread_id": "university-pilot-t005",
+     "author": "Marcus Bell",
+     "sent_at": "2026-10-21T15:22:00-05:00",
+     "text": "I'll aim for early January delivery so it doesn't collide",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udc4d",
+       "count": 2
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "dm-avery-jordan",
+   "name": "Avery Brooks, Jordan Lee",
+   "kind": "dm",
+   "members": [
+    "Avery Brooks",
+    "Jordan Lee"
+   ],
+   "messages": [
+    {
+     "id": "msg-0212",
+     "thread_id": "dm-avery-jordan-t001",
+     "author": "Jordan Lee",
+     "sent_at": "2025-03-25T14:10:00-05:00",
+     "text": "hey, the calibration procedure says put the arm in rest pose then run lerobot-calibrate. but Tyler turned the wrist by hand before starting. is that a thing?",
+     "reactions": []
+    },
+    {
+     "id": "msg-0213",
+     "thread_id": "dm-avery-jordan-t001",
+     "author": "Avery Brooks",
+     "sent_at": "2025-03-25T14:14:00-05:00",
+     "text": "yes always do the thing with the wrist first, otherwise it calibrates 180 off",
+     "reactions": []
+    },
+    {
+     "id": "msg-0214",
+     "thread_id": "dm-avery-jordan-t001",
+     "author": "Jordan Lee",
+     "sent_at": "2025-03-25T14:15:00-05:00",
+     "text": "ok \ud83d\udc4d is that in a doc somewhere?",
+     "reactions": []
+    },
+    {
+     "id": "msg-0215",
+     "thread_id": "dm-avery-jordan-t001",
+     "author": "Avery Brooks",
+     "sent_at": "2025-03-25T14:16:00-05:00",
+     "text": "not yet \ud83d\ude48",
+     "reactions": []
+    },
+    {
+     "id": "msg-0216",
+     "thread_id": "dm-avery-jordan-t002",
+     "author": "Jordan Lee",
+     "sent_at": "2025-05-12T08:30:00-05:00",
+     "text": "why is bench 3 locked on mondays until like 8?",
+     "reactions": []
+    },
+    {
+     "id": "msg-0217",
+     "thread_id": "dm-avery-jordan-t002",
+     "author": "Avery Brooks",
+     "sent_at": "2025-05-12T08:33:00-05:00",
+     "text": "I re-run the wrist calibration on the reference arm and the station every monday before anyone uses it",
+     "reactions": []
+    },
+    {
+     "id": "msg-0218",
+     "thread_id": "dm-avery-jordan-t002",
+     "author": "Jordan Lee",
+     "sent_at": "2025-05-12T08:34:00-05:00",
+     "text": "ok",
+     "reactions": []
+    },
+    {
+     "id": "msg-0219",
+     "thread_id": "dm-avery-jordan-t002",
+     "author": "Jordan Lee",
+     "sent_at": "2025-05-12T08:35:00-05:00",
+     "text": "is it a software thing?",
+     "reactions": []
+    },
+    {
+     "id": "msg-0220",
+     "thread_id": "dm-avery-jordan-t002",
+     "author": "Avery Brooks",
+     "sent_at": "2025-05-12T08:41:00-05:00",
+     "text": "no. easier to explain with the arm in front of us, remind me sometime",
+     "reactions": []
+    },
+    {
+     "id": "msg-0221",
+     "thread_id": "dm-avery-jordan-t003",
+     "author": "Jordan Lee",
+     "sent_at": "2026-08-13T16:20:00-05:00",
+     "text": "the 2 tight Novak adapters went back to Gus. he says he'll re-broach them",
+     "reactions": []
+    },
+    {
+     "id": "msg-0222",
+     "thread_id": "dm-avery-jordan-t003",
+     "author": "Avery Brooks",
+     "sent_at": "2026-08-13T16:21:00-05:00",
+     "text": "\ud83d\udc4d thanks",
+     "reactions": []
+    },
+    {
+     "id": "msg-0223",
+     "thread_id": "dm-avery-jordan-t004",
+     "author": "Jordan Lee",
+     "sent_at": "2026-10-07T15:05:00-05:00",
+     "text": "ok writing my list of things to learn from you. 1) monday recal 2) the wrist thing 3) PR 142 4) Kaihong/Wei 5) horn torque. anything else?",
+     "reactions": []
+    },
+    {
+     "id": "msg-0224",
+     "thread_id": "dm-avery-jordan-t004",
+     "author": "Avery Brooks",
+     "sent_at": "2026-10-07T15:12:00-05:00",
+     "text": "that's pretty much the stuff that isn't written down. good list",
+     "reactions": []
+    },
+    {
+     "id": "msg-0225",
+     "thread_id": "dm-avery-jordan-t004",
+     "author": "Jordan Lee",
+     "sent_at": "2026-10-07T15:13:00-05:00",
+     "text": "should I keep doing the Monday wrist recal after you leave? what's it actually for?",
+     "reactions": []
+    },
+    {
+     "id": "msg-0226",
+     "thread_id": "dm-avery-jordan-t004",
+     "author": "Avery Brooks",
+     "sent_at": "2026-10-07T15:20:00-05:00",
+     "text": "yes keep doing it, every monday before the line starts. I'll explain it properly before I go, it's easier to show you on the arm",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udc4d",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "id": "msg-0227",
+     "thread_id": "dm-avery-jordan-t004",
+     "author": "Jordan Lee",
+     "sent_at": "2026-10-07T15:24:00-05:00",
+     "text": "also Kevin keeps asking me who Wei is \ud83d\ude02",
+     "reactions": []
+    },
+    {
+     "id": "msg-0228",
+     "thread_id": "dm-avery-jordan-t004",
+     "author": "Avery Brooks",
+     "sent_at": "2026-10-07T15:30:00-05:00",
+     "text": "ha. Wei at Kaihong. I'll write that up too",
+     "reactions": []
+    },
+    {
+     "id": "msg-0229",
+     "thread_id": "dm-avery-jordan-t005",
+     "author": "Jordan Lee",
+     "sent_at": "2026-10-19T13:40:00-05:00",
+     "text": "looked at your branch. the TODO in firmware_notes says pick final value + 8h hold test. is the hold test rig set up anywhere?",
+     "reactions": []
+    },
+    {
+     "id": "msg-0230",
+     "thread_id": "dm-avery-jordan-t005",
+     "author": "Avery Brooks",
+     "sent_at": "2026-10-19T13:52:00-05:00",
+     "text": "bench 2, the jaw clamp + the USB thermometer. haven't run the 8h yet, that's the next step",
+     "reactions": []
+    },
+    {
+     "id": "msg-0231",
+     "thread_id": "dm-avery-jordan-t005",
+     "author": "Jordan Lee",
+     "sent_at": "2026-10-19T13:53:00-05:00",
+     "text": "ok. if you don't get to it before the 20th I'll need you to show me how you'd pick the number",
+     "reactions": []
+    },
+    {
+     "id": "msg-0232",
+     "thread_id": "dm-avery-jordan-t005",
+     "author": "Avery Brooks",
+     "sent_at": "2026-10-19T13:55:00-05:00",
+     "text": "deal",
+     "reactions": []
+    },
+    {
+     "id": "msg-0233",
+     "thread_id": "dm-avery-jordan-t006",
+     "author": "Jordan Lee",
+     "sent_at": "2026-10-23T11:00:00-05:00",
+     "text": "luis asked me what torque for the horn screws. I said 0.25 because that's what the drivers say. guide says 0.4. which do I put in v6?",
+     "reactions": []
+    },
+    {
+     "id": "msg-0234",
+     "thread_id": "dm-avery-jordan-t006",
+     "author": "Avery Brooks",
+     "sent_at": "2026-10-23T11:22:00-05:00",
+     "text": "let's go through that one together on Monday, there's a reason",
+     "reactions": []
+    }
+   ]
+  },
+  {
+   "id": "dm-avery-rosa",
+   "name": "Avery Brooks, Rosa Delgado",
+   "kind": "dm",
+   "members": [
+    "Avery Brooks",
+    "Rosa Delgado"
+   ],
+   "messages": [
+    {
+     "id": "msg-0235",
+     "thread_id": "dm-avery-rosa-t001",
+     "author": "Rosa Delgado",
+     "sent_at": "2025-02-03T07:35:00-06:00",
+     "text": "did you do the Monday recal? line's waiting",
+     "reactions": []
+    },
+    {
+     "id": "msg-0236",
+     "thread_id": "dm-avery-rosa-t001",
+     "author": "Avery Brooks",
+     "sent_at": "2025-02-03T07:36:00-06:00",
+     "text": "5 min!",
+     "reactions": []
+    },
+    {
+     "id": "msg-0237",
+     "thread_id": "dm-avery-rosa-t001",
+     "author": "Avery Brooks",
+     "sent_at": "2025-02-03T07:44:00-06:00",
+     "text": "done \u2705",
+     "reactions": []
+    },
+    {
+     "id": "msg-0238",
+     "thread_id": "dm-avery-rosa-t001",
+     "author": "Rosa Delgado",
+     "sent_at": "2025-02-03T07:45:00-06:00",
+     "text": "ty!",
+     "reactions": []
+    },
+    {
+     "id": "msg-0239",
+     "thread_id": "dm-avery-rosa-t002",
+     "author": "Rosa Delgado",
+     "sent_at": "2025-10-14T10:45:00-05:00",
+     "text": "changed the yellow drivers to 0.25. guide still says 0.4 tho",
+     "reactions": []
+    },
+    {
+     "id": "msg-0240",
+     "thread_id": "dm-avery-rosa-t002",
+     "author": "Avery Brooks",
+     "sent_at": "2025-10-14T10:47:00-05:00",
+     "text": "I know, I'll fix the guide",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udc4d",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "id": "msg-0241",
+     "thread_id": "dm-avery-rosa-t003",
+     "author": "Rosa Delgado",
+     "sent_at": "2026-04-06T07:30:00-05:00",
+     "text": "you in today? it's monday and aisha's asking about the recal",
+     "reactions": []
+    },
+    {
+     "id": "msg-0242",
+     "thread_id": "dm-avery-rosa-t003",
+     "author": "Avery Brooks",
+     "sent_at": "2026-04-06T07:42:00-05:00",
+     "text": "parking now! 2 min",
+     "reactions": []
+    },
+    {
+     "id": "msg-0243",
+     "thread_id": "dm-avery-rosa-t004",
+     "author": "Rosa Delgado",
+     "sent_at": "2026-10-13T16:00:00-05:00",
+     "text": "for the W49 changeover, do the v2 grippers need a different calibration?",
+     "reactions": []
+    },
+    {
+     "id": "msg-0244",
+     "thread_id": "dm-avery-rosa-t004",
+     "author": "Avery Brooks",
+     "sent_at": "2026-10-13T16:10:00-05:00",
+     "text": "same procedure, just the gripper_v2 profile once #142 is merged. I'll write it down",
+     "reactions": []
+    },
+    {
+     "id": "msg-0245",
+     "thread_id": "dm-avery-rosa-t004",
+     "author": "Rosa Delgado",
+     "sent_at": "2026-10-13T16:12:00-05:00",
+     "text": "also are you gonna fix the torque in the guide before you go? the 0.4 is still in there",
+     "reactions": []
+    },
+    {
+     "id": "msg-0246",
+     "thread_id": "dm-avery-rosa-t004",
+     "author": "Avery Brooks",
+     "sent_at": "2026-10-13T16:20:00-05:00",
+     "text": "yes, it's on my list with the procedure wrist step",
+     "reactions": []
+    }
+   ]
+  },
+  {
+   "id": "dm-avery-priya",
+   "name": "Avery Brooks, Priya Natarajan",
+   "kind": "dm",
+   "members": [
+    "Avery Brooks",
+    "Priya Natarajan"
+   ],
+   "messages": [
+    {
+     "id": "msg-0247",
+     "thread_id": "dm-avery-priya-t001",
+     "author": "Priya Natarajan",
+     "sent_at": "2026-07-22T09:10:00-05:00",
+     "text": "for the current limit, are you going by servo temp or by grip force?",
+     "reactions": []
+    },
+    {
+     "id": "msg-0248",
+     "thread_id": "dm-avery-priya-t001",
+     "author": "Avery Brooks",
+     "sent_at": "2026-07-22T09:18:00-05:00",
+     "text": "both. need enough force to hold ~1 kg with the v2 jaw, and the case under ~55C on a long hold",
+     "reactions": []
+    },
+    {
+     "id": "msg-0249",
+     "thread_id": "dm-avery-priya-t001",
+     "author": "Priya Natarajan",
+     "sent_at": "2026-07-22T09:19:00-05:00",
+     "text": "makes sense",
+     "reactions": []
+    },
+    {
+     "id": "msg-0250",
+     "thread_id": "dm-avery-priya-t001",
+     "author": "Priya Natarajan",
+     "sent_at": "2026-07-22T09:25:00-05:00",
+     "text": "do you want the backoff in the profile or in the teleop loop?",
+     "reactions": []
+    },
+    {
+     "id": "msg-0251",
+     "thread_id": "dm-avery-priya-t001",
+     "author": "Avery Brooks",
+     "sent_at": "2026-07-22T09:30:00-05:00",
+     "text": "profile, so it works no matter what software the customer runs",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udc4d",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "id": "msg-0252",
+     "thread_id": "dm-avery-priya-t002",
+     "author": "Priya Natarajan",
+     "sent_at": "2026-10-20T16:30:00-05:00",
+     "text": "honest q, will #142 actually land before the 20th? no pressure, just planning",
+     "reactions": []
+    },
+    {
+     "id": "msg-0253",
+     "thread_id": "dm-avery-priya-t002",
+     "author": "Avery Brooks",
+     "sent_at": "2026-10-20T16:45:00-05:00",
+     "text": "I want it to. if the hold test shows 230 is fine it's a one line change. if not I'll hand Jordan my notes",
+     "reactions": []
+    }
+   ]
+  },
+  {
+   "id": "dm-avery-daniel",
+   "name": "Avery Brooks, Daniel Okafor",
+   "kind": "dm",
+   "members": [
+    "Avery Brooks",
+    "Daniel Okafor"
+   ],
+   "messages": [
+    {
+     "id": "msg-0254",
+     "thread_id": "dm-avery-daniel-t001",
+     "author": "Daniel Okafor",
+     "sent_at": "2026-10-05T08:45:00-05:00",
+     "text": "thanks for telling me friday. I'll announce tomorrow unless you want to do it yourself",
+     "reactions": []
+    },
+    {
+     "id": "msg-0255",
+     "thread_id": "dm-avery-daniel-t001",
+     "author": "Avery Brooks",
+     "sent_at": "2026-10-05T08:50:00-05:00",
+     "text": "you announce it, I'll follow up with people individually",
+     "reactions": [
+      {
+       "emoji": "\ud83d\udc4d",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "id": "msg-0256",
+     "thread_id": "dm-avery-daniel-t001",
+     "author": "Daniel Okafor",
+     "sent_at": "2026-10-05T08:55:00-05:00",
+     "text": "and let me know what you need from me for the handover",
+     "reactions": []
+    },
+    {
+     "id": "msg-0257",
+     "thread_id": "dm-avery-daniel-t001",
+     "author": "Avery Brooks",
+     "sent_at": "2026-10-05T09:02:00-05:00",
+     "text": "time with Jordan, mostly. and maybe someone to own the assembly guide v6",
+     "reactions": []
+    },
+    {
+     "id": "msg-0258",
+     "thread_id": "dm-avery-daniel-t002",
+     "author": "Daniel Okafor",
+     "sent_at": "2026-10-26T14:00:00-05:00",
+     "text": "how's the handover going? anything you're worried about?",
+     "reactions": []
+    },
+    {
+     "id": "msg-0259",
+     "thread_id": "dm-avery-daniel-t002",
+     "author": "Avery Brooks",
+     "sent_at": "2026-10-26T14:10:00-05:00",
+     "text": "mostly the stuff that only lives in my head. the monday recal, the wrist homing step, the horn torque, and Wei at Kaihong. I'm doing the knowledge capture thing this week to get it all recorded",
+     "reactions": []
+    },
+    {
+     "id": "msg-0260",
+     "thread_id": "dm-avery-daniel-t002",
+     "author": "Daniel Okafor",
+     "sent_at": "2026-10-26T14:12:00-05:00",
+     "text": "great, thank you",
+     "reactions": []
+    }
+   ]
+  }
+ ]
+}

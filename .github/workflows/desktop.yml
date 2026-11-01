@@ -1,0 +1,55 @@
+name: Desktop apps
+# Builds the Mac (.dmg) and Windows (.exe) apps and attaches them to a GitHub release.
+# Run it from Actions → Desktop apps → Run workflow (or push a tag like v1.0.0).
+# Set the repository variable CLONEFLOW_URL to the website address (e.g. https://cloneflow-engine.onrender.com).
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: macos-latest
+            script: dist:mac
+            file: desktop/dist/CloneFlow.dmg
+          - os: windows-latest
+            script: dist:win
+            file: desktop/dist/CloneFlow-Setup.exe
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Point the app at the website
+        if: ${{ vars.CLONEFLOW_URL != '' }}
+        shell: bash
+        run: echo "{ \"server\": \"${{ vars.CLONEFLOW_URL }}\" }" > desktop/config.json
+      - run: npm ci
+        working-directory: desktop
+      - run: npm run ${{ matrix.script }}
+        working-directory: desktop
+        env: { CSC_IDENTITY_AUTO_DISCOVERY: "false" }
+      - uses: actions/upload-artifact@v4
+        with: { name: "${{ matrix.os }}", path: "${{ matrix.file }}" }
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { path: out, merge-multiple: true }
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_type == 'tag' && github.ref_name || 'desktop-latest' }}
+          name: Clone Flow desktop apps
+          body: "Clone Flow for Mac and Windows. Opens your organization's Clone Flow in its own window."
+          make_latest: true
+          files: |
+            out/CloneFlow.dmg
+            out/CloneFlow-Setup.exe
