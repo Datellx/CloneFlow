@@ -44,6 +44,7 @@ export const handover = {
   colleagues: () => get<{ id: number; name: string; email: string }[]>("/admin/colleagues"),
   inviteColleague: (b: { name: string; email: string }) =>
     post<{ id: number; name: string; email: string; link: string; emailed: boolean }>("/admin/colleagues", b),
+  restart: (eid: number, keep: boolean) => post<{ ok: boolean }>(`/admin/people/${eid}/restart?keep_connections=${keep}`, {}),
   resendInvite: (id: number) => post<{ emailed: boolean; link: string }>(`/admin/invites/${id}/resend`, {}),
   setup: () => get<T.SetupState>("/setup"),
   setupMessage: (text: string) => post<T.SetupReply>("/setup/message", { text }),
