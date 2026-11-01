@@ -91,6 +91,11 @@ def test_handover_end_to_end():
         ov = c.get("/api/admin/overview").json()
         assert ov["people"][0]["id"] == eid
         assert c.get(f"/api/employees/{eid}/cards").json()
+        prof = c.get(f"/api/employees/{eid}")  # profile + year timeline (must work on Postgres too)
+        assert prof.status_code == 200 and prof.json()["timeline"]
         a = c.post("/api/ask", json={"eid": None, "question": "Where are the spare servo horns?", "mode": "question"}).json()
         assert a["eid"] == eid
         assert c.get("/api/map").status_code == 200
+        # admin can start the handover over; the person begins again from the welcome
+        assert c.post(f"/api/admin/people/{eid}/restart?keep_connections=true").json()["ok"]
+        assert not c.get(f"/api/employees/{eid}/cards").json()
