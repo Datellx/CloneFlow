@@ -40,7 +40,7 @@ export const handover = {
 
   overview: () => get<T.AdminOverview>("/admin/overview"),
   invite: (b: { name: string; email: string; title?: string; team?: string; leaving_on?: string; focus?: string }) =>
-    post<{ employee: Employee; link: string }>("/admin/invite", b),
+    post<{ employee: Employee; link: string; emailed?: boolean }>("/admin/invite", b),
   setup: () => get<T.SetupState>("/setup"),
   setupMessage: (text: string) => post<T.SetupReply>("/setup/message", { text }),
   setupFinish: (skipped = false) => post<{ ok: boolean }>("/setup/finish", { skipped }),

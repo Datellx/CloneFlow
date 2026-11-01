@@ -1,10 +1,11 @@
 // Accounts: create an organization (admins), two-step sign-in by email, and the invitation page (people leaving).
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ArrowLeft, ArrowRight, BadgeCheck, Building2, Check, Clock, Eye, EyeOff, MessagesSquare, ShieldCheck, UserPlus } from "lucide-react";
+import { ArrowLeft, ArrowRight, BadgeCheck, Building2, Check, Clock, Eye, EyeOff, MailCheck, MessagesSquare, ShieldCheck, UserPlus } from "lucide-react";
 import { api } from "@/lib/api";
+import { exchange, resendConfirmation, sendPasswordReset, sessionFromLink, signIn, signUpInvite, signUpOrg, supabase } from "@/lib/auth";
 import { cn } from "@/lib/format";
 import { Logo } from "@/components/domain";
 import { Button } from "@/components/ui";
@@ -86,6 +87,7 @@ export function Signup() {
   const [agree, setAgree] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [sentTo, setSentTo] = useState<string | null>(null);
   const after = useAfterAuth();
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement>) => setF({ ...f, [k]: e.target.value });
   const submit = async (e: FormEvent) => {
@@ -94,15 +96,19 @@ export function Signup() {
     setErr(null);
     setLoading(true);
     try {
-      const me = await api.signup({ org_name: f.org_name.trim(), name: f.name.trim(), email: f.email.trim(), password: f.password });
-      toast.success(`${me.org.name} is ready`);
-      after(me);
+      const r = await signUpOrg({ org_name: f.org_name.trim(), name: f.name.trim(), email: f.email.trim(), password: f.password });
+      if ("me" in r) {
+        toast.success(`${r.me.org.name} is ready`);
+        after(r.me);
+      } else if ("checkEmail" in r) setSentTo(f.email.trim());
+      else setErr("An account with this email already exists. Sign in instead.");
     } catch (e2) {
       setErr((e2 as Error).message);
     } finally {
       setLoading(false);
     }
   };
+  if (sentTo) return <CheckEmail email={sentTo} what="create your organization" />;
   const next = [
     { icon: UserPlus, title: "Invite the person who's leaving", body: "They get a private link." },
     { icon: MessagesSquare, title: "They have one conversation", body: "About 20 minutes, in the browser." },
@@ -215,11 +221,29 @@ export function Login() {
     setErr(null);
     setLoading(true);
     try {
-      after(await api.login({ email: email.trim(), password }));
+      after(await signIn(email.trim(), password));
     } catch (e2) {
       setErr((e2 as Error).message);
     } finally {
       setLoading(false);
+    }
+  };
+  const [resetSent, setResetSent] = useState(false);
+  const forgot = async () => {
+    setErr(null);
+    try {
+      if (await sendPasswordReset(email.trim())) setResetSent(true);
+      else setErr("Ask your organization's admin to reset your password.");
+    } catch (e2) {
+      setErr((e2 as Error).message);
+    }
+  };
+  const resend = async () => {
+    try {
+      await resendConfirmation(email.trim());
+      toast.success("We sent a new confirmation link.");
+    } catch (e2) {
+      setErr((e2 as Error).message);
     }
   };
   const back = () => {
@@ -275,7 +299,18 @@ export function Login() {
               <input type="email" value={email} autoComplete="username" readOnly hidden />
               <PasswordField id="password" value={password} onChange={setPassword} autoComplete="current-password" inputRef={pw} />
               <FormError msg={err} />
+              {err?.includes("confirm your email") && (
+                <button type="button" onClick={resend} className="text-[13px] font-medium text-brand-700 hover:underline">Send the confirmation link again</button>
+              )}
+              {resetSent && (
+                <p role="status" className="rounded-xl border border-line bg-paper px-4 py-3 text-[13.5px] text-ink-soft">
+                  We emailed a link to reset your password to <span className="font-medium text-ink">{email}</span>.
+                </p>
+              )}
               <Button type="submit" size="lg" className="w-full !rounded-full" loading={loading}>Sign in</Button>
+              <div className="text-center">
+                <button type="button" onClick={forgot} className="text-[13px] font-medium text-ink-muted hover:text-ink">Forgot your password?</button>
+              </div>
             </form>
           </>
         )}
@@ -298,12 +333,27 @@ export function Join() {
     if (info.data) setF((x) => ({ ...x, name: x.name || info.data!.name || "", email: x.email || info.data!.email || "" }));
   }, [info.data]);
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement>) => setF({ ...f, [k]: e.target.value });
+  const [sentTo, setSentTo] = useState<string | null>(null);
+  // Arriving from the invitation email: Supabase signs them in from the link; they only choose a password.
+  const [fromEmail, setFromEmail] = useState(false);
+  useEffect(() => {
+    if (!window.location.hash.includes("access_token")) return;
+    sessionFromLink().then((sess) => {
+      if (sess?.user.email) {
+        setFromEmail(true);
+        setF((x) => ({ ...x, email: sess.user.email ?? x.email }));
+      }
+    }).catch((e2) => setErr((e2 as Error).message));
+  }, []);
   const submit = async (e: FormEvent) => {
     e.preventDefault();
     setErr(null);
     setLoading(true);
     try {
-      after(await api.join({ invite_code: code, name: f.name.trim(), email: f.email.trim(), password: f.password }));
+      const r = await signUpInvite({ invite_code: code, name: f.name.trim(), email: f.email.trim(), password: f.password });
+      if ("me" in r) after(r.me);
+      else if ("checkEmail" in r) setSentTo(f.email.trim());
+      else setErr("This email already has an account or an invitation email. Check your inbox, or sign in.");
     } catch (e2) {
       setErr((e2 as Error).message);
     } finally {
@@ -324,6 +374,7 @@ export function Join() {
       </CardFrame>
     );
 
+  if (sentTo) return <CheckEmail email={sentTo} what="start your handover" />;
   const d = info.data;
   const first = (d.name || f.name).trim().split(/\s+/)[0];
   return (
@@ -343,7 +394,8 @@ export function Join() {
         </div>
         <form onSubmit={submit} className="space-y-4 px-6 pb-7 pt-6 sm:px-9">
           <Input id="name" label="Your name" value={f.name} onChange={set("name")} autoComplete="name" required />
-          <Input id="email" label="Work email" type="email" value={f.email} onChange={set("email")} autoComplete="email" required hint={d.email ? "The address your invitation was sent to." : undefined} />
+          <Input id="email" label="Work email" type="email" value={f.email} onChange={set("email")} autoComplete="email" required readOnly={fromEmail}
+            hint={fromEmail ? "Confirmed from your invitation email." : d.email ? "The address your invitation was sent to." : undefined} />
           <PasswordField id="password" label="Choose a password" value={f.password} onChange={(v) => setF({ ...f, password: v })} autoComplete="new-password" hint="At least 8 characters, so you can come back to finish." />
           <FormError msg={err} />
           <Button type="submit" size="lg" className="w-full !rounded-full" loading={loading}>
@@ -354,6 +406,120 @@ export function Join() {
       <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-[12.5px] text-ink-faint">
         <Check className="h-3.5 w-3.5" /> When you finish, what you share goes to {d.org_name}'s knowledge base.
       </p>
+    </CardFrame>
+  );
+}
+
+/* =================================================================== email links */
+function CheckEmail({ email, what }: { email: string; what: string }) {
+  const [sent, setSent] = useState(false);
+  return (
+    <CardFrame footer={<>Wrong address? <Link to="/signup" className="font-medium text-brand-700 hover:underline">Start again</Link></>}>
+      <div className="card flex flex-col items-center px-6 py-10 text-center sm:px-9">
+        <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-50 text-brand-700 ring-1 ring-inset ring-brand-100"><MailCheck className="h-6 w-6" /></span>
+        <h1 className="mt-5 text-[28px] font-normal leading-tight text-ink">Check your email</h1>
+        <p className="mt-2 max-w-[36ch] text-[15px] leading-relaxed text-ink-muted">
+          We sent a confirmation link to <span className="font-medium text-ink">{email}</span>. Open it to {what}.
+        </p>
+        <button
+          onClick={async () => {
+            try {
+              await resendConfirmation(email);
+              setSent(true);
+            } catch (e) {
+              toast.error((e as Error).message);
+            }
+          }}
+          className="mt-6 text-[13.5px] font-medium text-brand-700 hover:underline"
+        >
+          {sent ? "Sent again — check spam too" : "Didn't get it? Send it again"}
+        </button>
+      </div>
+    </CardFrame>
+  );
+}
+
+/** /auth/callback — the confirmation link from the email lands here; it finishes sign-up and opens Clone Flow. */
+export function AuthCallback() {
+  useTitle("Signing you in");
+  const after = useAfterAuth();
+  const [err, setErr] = useState<string | null>(null);
+  useEffect(() => {
+    (async () => {
+      try {
+        const sess = await sessionFromLink(6000);
+        if (!sess) throw new Error("This link has expired or was already used. Sign in, or request a new link.");
+        after(await exchange(sess.access_token));
+      } catch (e) {
+        setErr((e as Error).message);
+      }
+    })();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  return (
+    <CardFrame footer={err && <Link to="/login" className="font-medium text-brand-700 hover:underline">Go to sign in</Link>}>
+      <div className="card flex flex-col items-center px-6 py-12 text-center sm:px-9">
+        <Orb size={92} state={err ? "idle" : "thinking"} />
+        <h1 className="mt-5 text-[24px] font-normal leading-snug text-ink">{err ? "We couldn't sign you in" : "Email confirmed. Opening Clone Flow…"}</h1>
+        {err && <p className="mt-2 max-w-[38ch] text-[14.5px] text-ink-muted">{err}</p>}
+      </div>
+    </CardFrame>
+  );
+}
+
+/** /auth/reset — "Forgot password" link: choose a new password. */
+export function ResetPassword() {
+  useTitle("Choose a new password");
+  const after = useAfterAuth();
+  const nav = useNavigate();
+  const [ready, setReady] = useState<boolean | null>(null);
+  const [pw, setPw] = useState("");
+  const [err, setErr] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    sessionFromLink(6000).then((s) => setReady(!!s)).catch((e) => {
+      setErr((e as Error).message);
+      setReady(false);
+    });
+  }, []);
+  const submit = async (e: FormEvent) => {
+    e.preventDefault();
+    setErr(null);
+    setLoading(true);
+    try {
+      const sb = await supabase();
+      if (!sb) throw new Error("Password reset isn't available.");
+      const { data, error } = await sb.auth.updateUser({ password: pw });
+      if (error) throw new Error(error.message);
+      const { data: s } = await sb.auth.getSession();
+      toast.success("Password changed");
+      if (s.session) after(await exchange(s.session.access_token));
+      else nav("/login", { replace: true });
+      void data;
+    } catch (e2) {
+      setErr((e2 as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  };
+  return (
+    <CardFrame>
+      <div className="card px-6 pb-7 pt-8 sm:px-9">
+        <h1 className="text-[28px] font-normal leading-tight text-ink">Choose a new password</h1>
+        {ready === null ? (
+          <div className="flex justify-center py-10"><Orb size={72} state="thinking" /></div>
+        ) : ready ? (
+          <form onSubmit={submit} className="mt-6 space-y-4">
+            <PasswordField id="new-password" label="New password" value={pw} onChange={setPw} autoComplete="new-password" hint="At least 8 characters." />
+            <FormError msg={err} />
+            <Button type="submit" size="lg" className="w-full !rounded-full" loading={loading}>Save and sign in</Button>
+          </form>
+        ) : (
+          <>
+            <p className="mt-3 text-[14.5px] text-ink-muted">{err ?? "This reset link has expired or was already used."}</p>
+            <Link to="/login" className="mt-5 inline-flex font-medium text-brand-700 hover:underline">Request a new link from the sign-in page</Link>
+          </>
+        )}
+      </div>
     </CardFrame>
   );
 }

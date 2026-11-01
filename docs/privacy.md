@@ -19,6 +19,8 @@ the vision model. Phone-walk links are random tokens that expire after two hours
 - Admins see the organization's console and knowledge base. A person leaving sees only their own conversation.
   Colleagues can ask questions but cannot browse anyone's sources.
 - Connections are read-only OAuth grants; tokens are encrypted at rest (Fernet, key derived from `SECRET_KEY`).
+- Accounts are verified by email through Supabase Auth; after sign-in the engine uses its own signed, HTTP-only
+  session cookie. All database tables have Row Level Security on, so Supabase's public API can't read them.
 - Sessions are signed, HTTP-only cookies. Large uploads sent straight to the engine use a 30-minute token that only
   works for the two upload routes.
 

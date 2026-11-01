@@ -3,8 +3,8 @@
 ```
  Browser / desktop app ──► Render: FastAPI engine (serves the website + /api) ──► Meta Model API (Muse)
                                                         │
-                                                        ├─ SQLite on a persistent disk (accounts, knowledge, cost log)
-                                                        ├─ uploads, key frames, voice clips
+                                                        ├─ Supabase: Auth (sign-in, email) + Postgres (accounts, knowledge, cost log)
+                                                        ├─ persistent disk: uploads, key frames, voice clips
                                                         └─ Microsoft Graph · Gmail API · GitHub API (read-only, OAuth)
 ```
 

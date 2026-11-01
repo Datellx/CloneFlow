@@ -19,6 +19,8 @@ export interface SystemStatus {
   plans?: Plan[];
   /** Desktop app installers; a platform listed in coming_soon has no installer yet. */
   download?: { mac: string | null; windows: string | null; coming_soon: ("mac" | "windows")[] };
+  /** Sign-in provider: Supabase (url + public anon key) or the built-in one. */
+  auth?: { provider: "supabase" | "local"; url?: string; anon_key?: string };
 }
 
 type OrgRole = "admin" | "member";

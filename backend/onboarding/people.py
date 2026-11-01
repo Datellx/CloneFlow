@@ -58,4 +58,9 @@ def invite(db, org: Org, by: User, p: dict) -> dict:
     inv = Invite(org_id=org.id, email=email, role="member", code=secrets.token_urlsafe(18), created_by=by.id)
     db.add(inv)
     db.commit()
-    return {"employee": core.employee_dict(db, c), "link": f"{settings.public_url.rstrip('/')}/join/{inv.code}"}
+    link = f"{settings.public_url.rstrip('/')}/join/{inv.code}"
+    from backend.app import supabase
+
+    emailed = supabase.send_invite(email, link, {"invite_code": inv.code, "name": c.expert_name, "org_name": org.name,
+                                                 "invited_by": by.name})
+    return {"employee": core.employee_dict(db, c), "link": link, "emailed": emailed}

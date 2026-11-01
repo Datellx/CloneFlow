@@ -6,9 +6,12 @@ from pathlib import Path
 os.environ.setdefault("DATA_DIR", tempfile.mkdtemp(prefix="cf_tests_"))
 os.environ["LLM_PROVIDER"] = "mock"
 os.environ.pop("DATABASE_URL", None)
+if os.environ.get("TEST_DATABASE_URL"):  # run the suite against Postgres: TEST_DATABASE_URL=postgresql://…
+    os.environ["DATABASE_URL"] = os.environ["TEST_DATABASE_URL"]
 for _k in ("GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET", "MS_CLIENT_ID", "MS_CLIENT_SECRET", "GITHUB_CLIENT_ID",
-           "GITHUB_CLIENT_SECRET"):
-    os.environ[_k] = ""  # tests never depend on a developer's .env.local connector keys
+           "GITHUB_CLIENT_SECRET", "SUPABASE_URL", "SUPABASE_ANON_KEY", "SUPABASE_SERVICE_ROLE_KEY", "MODEL_API_KEY",
+           "META_MODEL_API"):
+    os.environ[_k] = ""  # tests never depend on a developer's .env.local keys (offline, built-in sign-in)
 
 FIXTURES = Path(__file__).parent / "fixtures"
 

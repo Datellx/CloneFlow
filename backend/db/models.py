@@ -36,7 +36,8 @@ class User(Base):
     org_id: Mapped[int] = mapped_column(ForeignKey("orgs.id", ondelete="CASCADE"), index=True)
     name: Mapped[str] = mapped_column(String(200))
     email: Mapped[str] = mapped_column(String(320), unique=True, index=True)
-    password_hash: Mapped[str] = mapped_column(String(200))
+    password_hash: Mapped[str] = mapped_column(String(200), default="")  # empty for Supabase accounts
+    auth_id: Mapped[str | None] = mapped_column(String(64), unique=True, index=True)  # Supabase user id
     role: Mapped[str] = mapped_column(String(20), default="member")  # admin | member
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
     org: Mapped[Org] = relationship()

@@ -351,6 +351,7 @@ function InviteDialog({ open, onClose, org, from }: { open: boolean; onClose: ()
   const [f, setF] = useState({ name: "", email: "", title: "", leaving_on: "", focus: "" });
   const [loading, setLoading] = useState(false);
   const [link, setLink] = useState<string | null>(null);
+  const [emailed, setEmailed] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const close = () => {
     onClose();
@@ -367,6 +368,7 @@ function InviteDialog({ open, onClose, org, from }: { open: boolean; onClose: ()
     try {
       const r = await handover.invite({ name: f.name.trim(), email: f.email.trim(), title: f.title.trim() || undefined, leaving_on: f.leaving_on || undefined, focus: f.focus.trim() || undefined });
       setLink(r.link);
+      setEmailed(!!r.emailed);
       qc.invalidateQueries({ queryKey: handoverKeys.overview });
       qc.invalidateQueries({ queryKey: ["kb", "employees"] });
     } catch (e2) {
@@ -384,7 +386,9 @@ function InviteDialog({ open, onClose, org, from }: { open: boolean; onClose: ()
       title={link ? `${first ? `${first}'s` : "Their"} invitation is ready` : "Invite someone who's leaving"}
       description={
         link
-          ? "Send it however you like. It opens their private handover conversation in the browser."
+          ? emailed
+            ? `We emailed the invitation to ${f.email || "them"}. You can also send this link yourself.`
+            : "Send it however you like. It opens their private handover conversation in the browser."
           : "They get one private conversation with Clone Flow. You'll see their knowledge pack as it's saved."
       }
     >
