@@ -1,9 +1,12 @@
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, CalendarClock, ChevronDown, MessagesSquare, TriangleAlert } from "lucide-react";
+import { ArrowLeft, CalendarClock, ChevronDown, MessagesSquare, RotateCcw, TriangleAlert } from "lucide-react";
 import { ApiError } from "@/lib/api";
 import { cn } from "@/lib/format";
-import { Button, EmptyState, ErrorState, Skeleton } from "@/components/ui";
+import { Button, Dialog, EmptyState, ErrorState, Skeleton } from "@/components/ui";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { handover } from "../api";
 import { useBriefing, useCards, useEmployee } from "../../shared/api";
 import { CoverageRing, PersonAvatar, ProofChip, TYPE_META, TypeIcon, VerifiedBadge, daysUntil, firstName, fmtDay } from "../../shared/bits";
 import { ProofModal } from "../../shared/viewers";
@@ -38,9 +41,12 @@ export default function Pack() {
 
   return (
     <div>
-      <Link to="/admin/knowledge" className="mb-5 inline-flex items-center gap-1.5 text-[13px] font-medium text-ink-muted hover:text-ink">
-        <ArrowLeft className="h-4 w-4" /> Knowledge base
-      </Link>
+      <div className="mb-5 flex items-center justify-between gap-3">
+        <Link to="/admin/knowledge" className="inline-flex items-center gap-1.5 text-[13px] font-medium text-ink-muted hover:text-ink">
+          <ArrowLeft className="h-4 w-4" /> Knowledge base
+        </Link>
+        {e && <StartOver eid={eid} name={e.name} />}
+      </div>
       {!e ? (
         <Skeleton className="h-32 rounded-2xl" />
       ) : (
@@ -206,5 +212,40 @@ function Briefing({ eid, name, onOpen }: { eid: number; name: string; onOpen: (p
         </ul>
       </section>
     </div>
+  );
+}
+
+/** Admin: clear someone's handover so they can go through it again from the start. */
+function StartOver({ eid, name }: { eid: number; name: string }) {
+  const qc = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const run = async (keep: boolean) => {
+    setBusy(true);
+    try {
+      await handover.restart(eid, keep);
+      toast.success(`${firstName(name)}'s handover starts over on their next visit.`);
+      qc.invalidateQueries();
+      setOpen(false);
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <>
+      <button onClick={() => setOpen(true)} className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[12.5px] font-medium text-ink-muted hover:bg-white hover:text-ink">
+        <RotateCcw className="h-3.5 w-3.5" /> Start over
+      </button>
+      <Dialog open={open} onClose={() => setOpen(false)} title={`Start ${firstName(name)}'s handover over?`}
+        description="Their conversation, knowledge cards and interview are cleared. Their invitation link keeps working.">
+        <div className="flex flex-col gap-2 pb-3 sm:flex-row sm:justify-end">
+          <Button variant="secondary" onClick={() => setOpen(false)}>Cancel</Button>
+          <Button variant="secondary" loading={busy} onClick={() => run(true)}>Keep connected email and chats</Button>
+          <Button loading={busy} onClick={() => run(false)}>Start completely fresh</Button>
+        </div>
+      </Dialog>
+    </>
   );
 }

@@ -686,3 +686,36 @@ def finish(user: User) -> None:
         _set_state(c, stage="done")
         core.set_status(c, "captured")
         db.commit()
+
+
+# ---------------------------------------------------------------- start over (admin)
+def restart(eid: int, keep_connections: bool = False) -> None:
+    """Clear a person's handover so they can go through it again: conversation, cards, interview, Ask history.
+    keep_connections keeps what was already read from their email/chats (and the connections); otherwise those go too."""
+    from sqlalchemy import delete
+
+    from backend.db.models_knowledge import AskV2, FeedItem, WalkFrame, WalkSession
+    from . import connectors as CN
+
+    with SessionLocal() as db:
+        c = db.get(Clone, eid)
+        ivs = [i for (i,) in db.execute(select(InterviewV2.id).where(InterviewV2.clone_id == eid))] or [-1]
+        walks = [i for (i,) in db.execute(select(WalkSession.id).where(WalkSession.interview_id.in_(ivs)))] or [-1]
+        runs = [i for (i,) in db.execute(select(Run.id).where(Run.clone_id == eid))] or [-1]
+        db.execute(delete(WalkFrame).where(WalkFrame.session_id.in_(walks)))
+        db.execute(delete(WalkSession).where(WalkSession.id.in_(walks)))
+        db.execute(delete(QuestionV2).where(QuestionV2.interview_id.in_(ivs)))
+        db.execute(delete(InterviewV2).where(InterviewV2.clone_id == eid))
+        db.execute(delete(FeedItem).where(FeedItem.run_id.in_(runs)))
+        db.execute(delete(Run).where(Run.clone_id == eid))
+        db.execute(delete(Card).where(Card.clone_id == eid))
+        db.execute(delete(AskV2).where(AskV2.clone_id == eid))
+        db.execute(delete(SessionMsg).where(SessionMsg.clone_id == eid))
+        if not keep_connections:
+            db.execute(delete(SourceItem).where(SourceItem.clone_id == eid))
+            db.execute(delete(SourceConsent).where(SourceConsent.clone_id == eid))
+            db.execute(delete(CN.ConnectorToken).where(CN.ConnectorToken.clone_id == eid))
+        keep = {k: v for k, v in (c.settings or {}).items() if k in ("owner_email", "focus", "focus_by")}
+        c.settings = keep
+        c.status = "capturing"
+        db.commit()

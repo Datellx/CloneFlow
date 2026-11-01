@@ -365,6 +365,18 @@ def admin_colleagues(ctx: Ctx = Depends(current)):
     return [{"id": u.id, "name": u.name, "email": u.email} for u in rows if u.id not in owners]
 
 
+@router.post("/admin/people/{eid}/restart")
+def admin_restart(eid: int, keep_connections: bool = False, ctx: Ctx = Depends(current)):
+    """Start someone's handover over (their next visit begins from the welcome)."""
+    _admin(ctx)
+    writable()
+    c = ctx.db.get(Clone, eid)
+    if c is None or c.org_id != ctx.org.id:
+        raise HTTPException(404, "Not found.")
+    S.restart(eid, keep_connections)
+    return {"ok": True}
+
+
 @router.post("/admin/invites/{invite_id}/resend")
 def admin_invite_resend(invite_id: int, ctx: Ctx = Depends(current)):
     """Send the invitation email again (with the current site address)."""
