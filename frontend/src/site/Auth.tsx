@@ -396,7 +396,9 @@ export function Join() {
           <Input id="name" label="Your name" value={f.name} onChange={set("name")} autoComplete="name" required />
           <Input id="email" label="Work email" type="email" value={f.email} onChange={set("email")} autoComplete="email" required readOnly={fromEmail}
             hint={fromEmail ? "Confirmed from your invitation email." : d.email ? "The address your invitation was sent to." : undefined} />
-          <PasswordField id="password" label="Choose a password" value={f.password} onChange={(v) => setF({ ...f, password: v })} autoComplete="new-password" hint="At least 8 characters, so you can come back to finish." />
+          {!fromEmail && (
+            <PasswordField id="password" label="Choose a password" value={f.password} onChange={(v) => setF({ ...f, password: v })} autoComplete="new-password" hint="At least 8 characters, so you can come back to finish." />
+          )}
           <FormError msg={err} />
           <Button type="submit" size="lg" className="w-full !rounded-full" loading={loading}>
             Start my handover {!loading && <ArrowRight className="h-4 w-4" />}

@@ -54,7 +54,8 @@ export async function signUpInvite(p: { invite_code: string; name: string; email
   // Arrived from the invitation email: already signed in with Supabase — just choose a password.
   const { data: cur } = await sb.auth.getSession();
   if (cur.session && cur.session.user.email?.toLowerCase() === p.email.toLowerCase()) {
-    const { error } = await sb.auth.updateUser({ password: p.password, data: { name: p.name } });
+    // The email link already proved who they are; a password is optional (to come back without the link).
+    const { error } = await sb.auth.updateUser(p.password ? { password: p.password, data: { name: p.name } } : { data: { name: p.name } });
     if (error) throw new Error(friendly(error.message));
     return { me: await exchange(cur.session.access_token, { invite_code: p.invite_code, name: p.name }) };
   }
