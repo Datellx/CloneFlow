@@ -151,7 +151,7 @@ def session_dict(db, user: User, c: Clone | None) -> dict:
         return {"eid": c.id if c else None, "name": user.name, "first_name": first, "company": org.name, "stage": "welcome",
                 "messages": [{"id": 0, "role": "avatar", "kind": "text", "at": None, "payload": None,
                               "text": f"Hi {first}. Before you go, let's make sure what you know stays with "
-                                      f"{org.name}. It's just a conversation, about 15 minutes."}],
+                                      f"{org.name}. It's just a conversation, about 20 minutes."}],
                 "actions": [{"type": "start"}], "question": None, "coverage": 0, "coverage_before": None,
                 "progress": {"asked": 0, "total": 0}, "run": None, "sources": [], "cards_recent": [],
                 "ai_enabled": ai.ai_ready()}
@@ -678,7 +678,7 @@ def finish(user: User) -> None:
         summ = (iv.summary or {}) if iv else {}
         cov = core.coverage(db, eid)
         first = _first(c.expert_name)
-        succ = (c.settings or {}).get("successor") or "your successor"
+        succ = (c.settings or {}).get("successor") or "Your successor"
         say(db, eid, "", kind="summary", payload={**summ, "coverage_after": cov})
         say(db, eid, f"Thank you, {first}. Your knowledge is saved with {db.get(Org, c.org_id).name} — coverage went "
                      f"from {summ.get('coverage_before', 0)}% to {cov}%. {succ.split(' (')[0]} can now ask it anything, "
