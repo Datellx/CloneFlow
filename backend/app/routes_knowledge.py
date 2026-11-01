@@ -6,7 +6,7 @@ from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from pydantic import BaseModel
-from sqlalchemy import case, func, or_, select
+from sqlalchemy import case, extract, func, or_, select
 
 from backend.db.models import Clone
 from backend.db.models_knowledge import (AskV2, Card, SourceItem)
@@ -72,12 +72,14 @@ def employee(eid: int, ctx: Ctx = Depends(current)):
 
 def _timeline(db, eid: int) -> list[dict]:
     """Year-by-year activity for the knowledge map / profile (free: counts only)."""
-    rows = db.execute(select(func.strftime("%Y", SourceItem.sent_at), SourceItem.kind, func.count())
+    yr = extract("year", SourceItem.sent_at)  # works on Postgres and SQLite
+    rows = db.execute(select(yr, SourceItem.kind, func.count())
                       .where(SourceItem.clone_id == eid, SourceItem.sent_at.is_not(None))
-                      .group_by(func.strftime("%Y", SourceItem.sent_at), SourceItem.kind)).all()
+                      .group_by(yr, SourceItem.kind)).all()
     years: dict[str, dict] = {}
     for y, k, n in rows:
         if y:
+            y = str(int(y))
             years.setdefault(y, {"year": int(y), "mail": 0, "chat": 0, "file": 0})[k] = n
     return [years[y] for y in sorted(years)]
 
