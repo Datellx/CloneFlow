@@ -119,9 +119,10 @@ def _merge(old: dict, new: dict) -> dict:
     for k in PROFILE_KEYS:
         v = (new or {}).get(k)
         if k in LIST_KEYS:
+            # The model returns the FULL current profile, so its lists replace the old ones (corrections can remove).
             if isinstance(v, list) and v:
                 seen, merged = set(), []
-                for x in list(old.get(k) or []) + [str(i).strip() for i in v]:
+                for x in (str(i).strip() for i in v):
                     if x and x.lower() not in seen:
                         seen.add(x.lower())
                         merged.append(x[:80])
@@ -145,9 +146,12 @@ def message(user: User, text: str) -> dict:
         prof = dict(org.profile or {})
         known = {k: prof.get(k) for k in PROFILE_KEYS if prof.get(k)}
         org_name = org.name
+        people_now = PEOPLE.people_in(db, org_id)
     user_prompt = (f"Organization: {org_name}\nAdmin: {user.name}\nToday: {date.today().isoformat()}\n"
                    f"Already set up before this turn: {bool(prof.get('done'))}\n"
-                   f"Current profile: {json.dumps(known)}\n\nConversation so far:\n{convo}")
+                   f"Current profile: {json.dumps(known)}\n"
+                   f"Already invited (don't return them in people unless the admin changes their details): "
+                   f"{json.dumps(people_now) if people_now else 'nobody yet'}\n\nConversation so far:\n{convo}")
     out = ai.call_json("setup", None, SYSTEM, user_prompt, SCHEMA, "SetupTurn", org_id=org_id)
     invites, problems = [], []
     with SessionLocal() as db:
@@ -159,6 +163,8 @@ def message(user: User, text: str) -> dict:
         org.profile = merged
         db.commit()
         for p in (out.get("people") or [])[:10]:
+            if PEOPLE.update_existing(db, org, p):  # already invited: details updated, no second invitation
+                continue
             try:
                 r = PEOPLE.invite(db, org, admin, p)
                 invites.append({"name": r["employee"]["name"], "email": p.get("email", "").lower(), "link": r["link"],

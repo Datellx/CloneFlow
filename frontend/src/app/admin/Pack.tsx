@@ -106,7 +106,7 @@ export default function Pack() {
             <div className="grid gap-3 md:grid-cols-2">{[0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-36 rounded-2xl" />)}</div>
           ) : !groups.length ? (
             <EmptyState className="rounded-2xl border border-dashed border-line-strong bg-white" title="Nothing captured yet">
-              Cards appear here as {name || "they"} connect their work and talk with Clone Flow.
+              Cards appear here as {name || "their"}{name ? "’s" : ""} handover conversation goes.
             </EmptyState>
           ) : (
             <div className="space-y-9">

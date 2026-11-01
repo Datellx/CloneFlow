@@ -86,3 +86,29 @@ def invite_colleague(db, org: Org, by: User, p: dict) -> dict:
     emailed = supabase.send_invite(email, link, {"invite_code": inv.code, "name": name, "org_name": org.name,
                                                  "invited_by": by.name})
     return {"id": inv.id, "name": name, "email": email, "link": link, "emailed": emailed}
+
+
+def people_in(db, org_id: int) -> list[dict]:
+    """Everyone already invited to a handover in this organization (for the setup assistant's context)."""
+    return [{"name": c.expert_name, "email": (c.settings or {}).get("owner_email"), "title": c.title,
+             "leaving_on": c.leaving_on.isoformat() if c.leaving_on else None}
+            for c in db.scalars(select(Clone).where(Clone.org_id == org_id)) if (c.settings or {}).get("owner_email")]
+
+
+def update_existing(db, org: Org, p: dict) -> bool:
+    """If this person already has a handover here, update their title / last day / focus instead of inviting again."""
+    email = str(p.get("email") or "").strip().lower()
+    c = next((c for c in db.scalars(select(Clone).where(Clone.org_id == org.id))
+              if (c.settings or {}).get("owner_email") == email), None)
+    if c is None:
+        return False
+    if str(p.get("title") or "").strip():
+        c.title = str(p["title"]).strip()[:200]
+    if _date(p.get("leaving_on")):
+        c.leaving_on = _date(p.get("leaving_on"))
+    if str(p.get("focus") or "").strip():
+        st = dict(c.settings or {})
+        st["focus"] = str(p["focus"]).strip()[:600]
+        c.settings = st
+    db.commit()
+    return True
