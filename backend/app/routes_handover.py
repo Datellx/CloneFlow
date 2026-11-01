@@ -209,10 +209,14 @@ def connect_start(provider: str, seed: bool = False, ctx: Ctx = Depends(current)
 
 
 @router.get("/connect/{provider}/callback")
-def connect_callback(provider: str, code: str = "", state: str = "", error: str = ""):
+def connect_callback(provider: str, code: str = "", state: str = "", error: str = "", error_description: str = ""):
+    from urllib.parse import quote
+
     key = "gmail" if provider == "google" else provider
     if error or not code:
-        return RedirectResponse(f"/session?connect_error={key}", status_code=302)
+        S.log.warning("connect %s refused: %s %s", provider, error, error_description[:300])
+        why = quote((error_description or error or "cancelled").split("\r")[0][:160])
+        return RedirectResponse(f"/session?connect_error={key}&why={why}", status_code=302)
     try:
         st = CN.read_state_full(state, provider)
         if st.get("login"):
@@ -233,9 +237,10 @@ def connect_callback(provider: str, code: str = "", state: str = "", error: str 
             return RedirectResponse("/admin?seeding=gmail", status_code=302)
         CN.save_token(eid, provider, tok)
         CN.start_import(eid, provider)
-    except Exception:
+    except Exception as exc:
         S.log.exception("connect callback failed")
-        return RedirectResponse(f"/session?connect_error={key}", status_code=302)
+        detail = getattr(getattr(exc, "response", None), "text", "") or str(exc)
+        return RedirectResponse(f"/session?connect_error={key}&why={quote(detail[:160])}", status_code=302)
     return RedirectResponse(f"/session?connected={key}", status_code=302)
 
 
