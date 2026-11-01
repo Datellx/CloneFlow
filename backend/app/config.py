@@ -70,7 +70,10 @@ class Settings:
     cookie_secure: bool = field(default_factory=lambda: _bool("COOKIE_SECURE", False))
     # Master switch for paid model calls. Off means the engine never contacts the model API.
     ai_enabled: bool = field(default_factory=lambda: _bool("AI_ENABLED", True))
-    public_url: str = field(default_factory=lambda: os.environ.get("PUBLIC_URL", "http://localhost:8000"))
+    # The site's own address (links in emails, OAuth redirects). Render sets RENDER_EXTERNAL_URL by itself.
+    public_url: str = field(default_factory=lambda: (os.environ.get("PUBLIC_URL", "").strip()
+                                                     or os.environ.get("RENDER_EXTERNAL_URL", "").strip()
+                                                     or "http://localhost:8000"))
     # Supabase (sign-in and email). Postgres is DATABASE_URL above.
     supabase_url: str = field(default_factory=lambda: os.environ.get("SUPABASE_URL", "").strip())
     supabase_anon_key: str = field(default_factory=lambda: os.environ.get("SUPABASE_ANON_KEY", "").strip())
