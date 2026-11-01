@@ -1,8 +1,8 @@
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { BookOpen, Check, ChevronRight, Copy, Mail, MessageCircleQuestion, Sparkles, UserPlus, X } from "lucide-react";
+import { BookOpen, Check, ChevronRight, Copy, Mail, MessageCircleQuestion, Sparkles, UserPlus, Users, X } from "lucide-react";
 import { useMe } from "@/lib/api";
 import { cn } from "@/lib/format";
 import { Button, Dialog, ErrorState, Field, LinkButton, Skeleton } from "@/components/ui";
@@ -120,6 +120,7 @@ export default function Overview() {
             </div>
             <ChevronRight className="h-4 w-4 text-ink-faint" />
           </Link>
+          <ColleaguesCard />
           <div className="card p-5">
             <div className="flex items-center gap-2 text-[14px] font-semibold text-ink"><MessageCircleQuestion className="h-4 w-4 text-brand-700" /> Questions nobody could answer</div>
             <p className="mt-1 text-[12.5px] text-ink-muted">Asked in Teams or Ask Clone Flow, not covered yet. Good topics for the next handover.</p>
@@ -371,6 +372,91 @@ function mailtoFor({ name, email, link, org, from }: { name: string; email: stri
     from,
   ].join("\n");
   return `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+/* ------------------------------------------------------------------ colleagues who ask */
+function ColleaguesCard() {
+  const q = useQuery({ queryKey: ["admin", "colleagues"], queryFn: handover.colleagues });
+  const [open, setOpen] = useState(false);
+  const people = q.data ?? [];
+  return (
+    <div className="card p-5">
+      <div className="flex items-center gap-2 text-[14px] font-semibold text-ink"><Users className="h-4 w-4 text-brand-700" /> People who can ask</div>
+      <p className="mt-1 text-[12.5px] text-ink-muted">Colleagues ask in Teams with @Clone Flow, or sign in on the web to Ask.</p>
+      {people.length > 0 && (
+        <ul className="mt-3 space-y-2">
+          {people.slice(0, 6).map((p) => (
+            <li key={p.id} className="flex items-center gap-2.5">
+              <PersonAvatar name={p.name} size={26} />
+              <div className="min-w-0 leading-tight">
+                <div className="truncate text-[13.5px] font-medium text-ink">{p.name}</div>
+                <div className="truncate text-[12px] text-ink-muted">{p.email}</div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+      <Button className="mt-4 w-full" variant="secondary" size="sm" icon={<UserPlus className="h-4 w-4" />} onClick={() => setOpen(true)}>Invite a colleague</Button>
+      <ColleagueDialog open={open} onClose={() => setOpen(false)} />
+    </div>
+  );
+}
+
+function ColleagueDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const qc = useQueryClient();
+  const [f, setF] = useState({ name: "", email: "" });
+  const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState<{ link: string; emailed: boolean } | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+  const close = () => {
+    onClose();
+    window.setTimeout(() => { setF({ name: "", email: "" }); setDone(null); setErr(null); }, 250);
+  };
+  const submit = async (e: FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setErr(null);
+    try {
+      const r = await handover.inviteColleague({ name: f.name.trim(), email: f.email.trim() });
+      setDone({ link: r.link, emailed: r.emailed });
+      qc.invalidateQueries({ queryKey: handoverKeys.overview });
+    } catch (e2) {
+      setErr((e2 as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const first = f.name.trim().split(/\s+/)[0];
+  return (
+    <Dialog open={open} onClose={close}
+      title={done ? `${first || "Their"} invitation is ready` : "Invite a colleague"}
+      description={done ? (done.emailed ? `We emailed ${f.email}. You can also send this link yourself.` : "Send them this link. It lets them sign in and ask.")
+        : "They can ask everything your people handed over, with sources. They don't see anyone's conversation."}>
+      {done ? (
+        <div className="pb-3">
+          <div className="flex items-center gap-2 rounded-xl border border-line bg-paper p-2 pl-3">
+            <code className="min-w-0 flex-1 truncate font-mono text-[13px] text-ink">{done.link}</code>
+            <CopyLink link={done.link} />
+          </div>
+          <div className="mt-6 flex justify-end"><Button variant="secondary" onClick={close}>Done</Button></div>
+        </div>
+      ) : (
+        <form onSubmit={submit} className="space-y-4 pb-3">
+          <Field label="Name" htmlFor="col-name">
+            <input id="col-name" className="input" value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} required autoComplete="off" />
+          </Field>
+          <Field label="Work email" htmlFor="col-email">
+            <input id="col-email" type="email" className="input" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} required autoComplete="off" placeholder="name@company.com" />
+          </Field>
+          {err && <p role="alert" className="rounded-lg border border-[#F0D5D5] bg-[#FFF8F8] px-3 py-2 text-sm text-[#9B1C1C]">{err}</p>}
+          <div className="flex justify-end gap-2 pt-1">
+            <Button type="button" variant="secondary" onClick={close}>Cancel</Button>
+            <Button type="submit" loading={loading}>Send invitation</Button>
+          </div>
+        </form>
+      )}
+    </Dialog>
+  );
 }
 
 function InviteDialog({ open, onClose, org, from }: { open: boolean; onClose: () => void; org: string; from: string }) {

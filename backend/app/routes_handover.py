@@ -300,7 +300,8 @@ def admin_overview(ctx: Ctx = Depends(current)):
 
 def _invite_row(ctx: Ctx, i, clones) -> dict:
     c = next((c for c in clones if (c.settings or {}).get("owner_email") == i.email), None)
-    return {"id": i.id, "email": i.email, "name": c.expert_name if c else i.email, "eid": c.id if c else None,
+    return {"id": i.id, "email": i.email, "name": c.expert_name if c else (i.name or i.email), "eid": c.id if c else None,
+            "kind": "handover" if c else (i.kind or "colleague"),
             "accepted": i.accepted, "link": f"{settings.public_url.rstrip('/')}/join/{i.code}",
             "created_at": core.iso(i.created_at)}
 
@@ -330,6 +331,33 @@ def admin_invite(body: InviteIn, ctx: Ctx = Depends(current)):
         return invite(ctx.db, ctx.org, ctx.user, body.model_dump())
     except InviteError as exc:
         raise HTTPException(exc.status, str(exc)) from exc
+
+
+class ColleagueIn(BaseModel):
+    name: str
+    email: str
+
+
+@router.post("/admin/colleagues")
+def admin_invite_colleague(body: ColleagueIn, ctx: Ctx = Depends(current)):
+    """Invite a colleague who stays: they can ask the knowledge base on the web (Teams needs no invitation)."""
+    from backend.onboarding.people import InviteError, invite_colleague
+
+    _admin(ctx)
+    writable()
+    try:
+        return invite_colleague(ctx.db, ctx.org, ctx.user, body.model_dump())
+    except InviteError as exc:
+        raise HTTPException(exc.status, str(exc)) from exc
+
+
+@router.get("/admin/colleagues")
+def admin_colleagues(ctx: Ctx = Depends(current)):
+    """Everyone who can ask (colleagues who joined), for the console."""
+    _admin(ctx)
+    owners = {c.owner_user_id for c in ctx.db.scalars(select(Clone).where(Clone.org_id == ctx.org.id))}
+    rows = ctx.db.scalars(select(User).where(User.org_id == ctx.org.id, User.role != "admin")).all()
+    return [{"id": u.id, "name": u.name, "email": u.email} for u in rows if u.id not in owners]
 
 
 @router.post("/admin/invites/{invite_id}/resend")

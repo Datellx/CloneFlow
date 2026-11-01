@@ -81,7 +81,7 @@ export const api = {
   join: (b: { invite_code: string; name: string; email: string; password: string }) => post<T.Me>("/auth/join", b),
   logout: () => post<{ ok: true }>("/auth/logout"),
   inviteInfo: (code: string) =>
-    get<{ org_name: string; email: string; role: string; name: string; title: string; leaving_on: string | null; inviter: string | null }>(
+    get<{ org_name: string; email: string; role: string; kind?: "handover" | "colleague"; name: string; title: string; leaving_on: string | null; inviter: string | null }>(
       `/auth/invite/${encodeURIComponent(code)}`,
     ),
   lookup: (email: string) => post<{ found: boolean; org_name: string | null; microsoft: boolean }>("/auth/lookup", { email }),
