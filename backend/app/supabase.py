@@ -55,3 +55,19 @@ def send_invite(email: str, redirect_to: str, data: dict) -> bool:
         log.info("invite email not sent (%s): %s", r.status_code, r.text[:200])
         return False
     return True
+
+
+def send_sign_in_link(email: str, redirect_to: str) -> bool:
+    """Email a one-time sign-in link (used to resend an invitation when the address already has a Supabase account)."""
+    if not enabled():
+        return False
+    try:
+        r = httpx.post(f"{settings.supabase_url.rstrip('/')}/auth/v1/otp", params={"redirect_to": redirect_to},
+                       json={"email": email, "create_user": False}, timeout=20,
+                       headers={"apikey": settings.supabase_anon_key})
+    except httpx.HTTPError:
+        return False
+    if r.status_code >= 300:
+        log.info("sign-in link not sent (%s): %s", r.status_code, r.text[:200])
+        return False
+    return True

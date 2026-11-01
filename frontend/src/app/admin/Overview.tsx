@@ -93,10 +93,8 @@ export default function Overview() {
                       <div className="truncate text-[14px] font-medium text-ink">{i.name || i.email}</div>
                       <div className="truncate text-[12.5px] text-ink-muted">{i.email} · sent {fmtDay(i.created_at)}</div>
                     </div>
-                    <a href={mailtoFor({ name: i.name || "", email: i.email, link: i.link, org: d?.org.name ?? "", from: me?.user.name ?? "" })}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-line px-2.5 py-1.5 text-[12.5px] font-medium text-ink-soft hover:border-line-strong hover:text-ink">
-                      <Mail className="h-3.5 w-3.5" /> Email
-                    </a>
+                    <ResendButton id={i.id} mailto={mailtoFor({ name: i.name || "", email: i.email, link: i.link, org: d?.org.name ?? "", from: me?.user.name ?? "" })} />
+
                     <CopyLink link={i.link} />
                   </li>
                 ))}
@@ -307,6 +305,35 @@ function PersonRow({ p, quiet, invited }: { p: Employee; quiet?: boolean; invite
         <ChevronRight className="h-4 w-4 shrink-0 text-ink-faint transition-transform group-hover:translate-x-0.5" />
       </Link>
     </li>
+  );
+}
+
+function ResendButton({ id, mailto }: { id: number; mailto: string }) {
+  const [state, setState] = useState<"idle" | "sending" | "sent">("idle");
+  const cls = "inline-flex items-center gap-1.5 rounded-lg border border-line px-2.5 py-1.5 text-[12.5px] font-medium text-ink-soft hover:border-line-strong hover:text-ink disabled:opacity-60";
+  return (
+    <button
+      className={cls}
+      disabled={state !== "idle"}
+      onClick={async () => {
+        setState("sending");
+        try {
+          const r = await handover.resendInvite(id);
+          if (r.emailed) {
+            setState("sent");
+            toast.success("Invitation sent again.");
+            return;
+          }
+        } catch {
+          /* fall through to the mail app */
+        }
+        setState("idle");
+        window.location.href = mailto;
+      }}
+    >
+      {state === "sent" ? <Check className="h-3.5 w-3.5 text-sure" /> : <Mail className="h-3.5 w-3.5" />}
+      {state === "sent" ? "Sent" : state === "sending" ? "Sending…" : "Resend"}
+    </button>
   );
 }
 

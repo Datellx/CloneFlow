@@ -332,6 +332,22 @@ def admin_invite(body: InviteIn, ctx: Ctx = Depends(current)):
         raise HTTPException(exc.status, str(exc)) from exc
 
 
+@router.post("/admin/invites/{invite_id}/resend")
+def admin_invite_resend(invite_id: int, ctx: Ctx = Depends(current)):
+    """Send the invitation email again (with the current site address)."""
+    from backend.app import supabase
+
+    _admin(ctx)
+    inv = ctx.db.get(Invite, invite_id)
+    if inv is None or inv.org_id != ctx.org.id or inv.accepted:
+        raise HTTPException(404, "This invitation is no longer open.")
+    link = f"{settings.public_url.rstrip('/')}/join/{inv.code}"
+    sent = supabase.send_invite(inv.email, link, {"invite_code": inv.code, "org_name": ctx.org.name,
+                                                  "invited_by": ctx.user.name}) \
+        or supabase.send_sign_in_link(inv.email, link)
+    return {"emailed": sent, "link": link}
+
+
 _ = READ_ONLY
 
 
