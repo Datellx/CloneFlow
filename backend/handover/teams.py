@@ -130,7 +130,7 @@ def to_teams(res: dict) -> dict:
         ap = res.get("ask_person") or {}
         tip = f" Try asking **{ap['name']}** ({ap.get('why', '')})." if ap.get("name") else ""
         return {"type": "message", "text": f"I don't know — no one covered this in what they left behind, so I won't guess.{tip}"}
-    head = f"**From {who}'s knowledge**" + (" · ✅ verified in their exit interview" if res.get("verified") else "")
+    head = f"**From {who}'s handover**" + (f" · ✅ confirmed by {who.split()[0]}" if res.get("verified") and who else "")
     lines = [head, "", res.get("answer", "")]
     if res.get("steps"):
         lines += [""] + [f"{i}. {s}" for i, s in enumerate(res["steps"], 1)]
