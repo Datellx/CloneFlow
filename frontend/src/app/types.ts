@@ -117,4 +117,4 @@ export interface SetupState {
 export interface SetupReply { messages: SetupMsg[]; done: boolean; profile: OrgProfile; plan: PlanUsage }
 
 /** Microsoft Teams outgoing webhook ("@Clone Flow …" in a channel). */
-export interface TeamsSetup { webhook_url: string; configured: boolean; bot_name: string }
+export interface TeamsSetup { webhook_url: string; configured: boolean; bot_name: string; last?: { status: "ok" | "signature" | "error"; detail: string; at: string } | null }

@@ -13,6 +13,7 @@ import hashlib
 import hmac
 import re
 import time
+from datetime import datetime
 
 import jwt
 from sqlalchemy import ForeignKey, String, Text, select
@@ -23,7 +24,14 @@ from backend.db.models import Base, Org
 from backend.db.store import SessionLocal
 
 _POOL = cf.ThreadPoolExecutor(max_workers=4)
-REPLY_BUDGET_S = 4.0
+REPLY_BUDGET_S = 3.5  # Teams gives an outgoing webhook 5 s in total
+LAST: dict[int, dict] = {}  # org id → the last message's outcome (shown on the admin's Teams page)
+
+
+def note(org_id: int, status: str, detail: str) -> None:
+    from backend.knowledge import core
+
+    LAST[org_id] = {"status": status, "detail": detail, "at": core.iso(datetime.utcnow())}
 
 
 class TeamsHook(Base):
@@ -96,7 +104,10 @@ def answer(org_id: int, question: str) -> dict:
     try:
         res = fut.result(timeout=REPLY_BUDGET_S)
     except cf.TimeoutError:  # the model is still composing: answer from the best card now (free); cached for next time
-        res = ASK.ask_org(org_id, question, None, allow_ai=False)
+        try:
+            res = _POOL.submit(ASK.ask_org, org_id, question, None, False).result(timeout=1.2)
+        except cf.TimeoutError:
+            return {"type": "message", "text": "Still looking through what your colleagues left behind. Ask me again in a moment."}
     return to_teams(res)
 
 

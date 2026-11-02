@@ -415,6 +415,7 @@ from backend.handover import teams as TM  # noqa: E402
 def admin_teams(ctx: Ctx = Depends(current)):
     _admin(ctx)
     return {"webhook_url": TM.webhook_url(ctx.org), "configured": TM.configured(ctx.org.id), "bot_name": "Clone Flow",
+            "last": TM.LAST.get(ctx.org.id),
             "public": not settings.public_url.startswith("http://localhost")}
 
 
@@ -446,17 +447,29 @@ async def teams_webhook(slug: str, request: Request):
     from backend.db.models import Org
     from backend.db.store import SessionLocal
 
+    import json as _json
+    import time as _time
+
+    import anyio
+
+    t0 = _time.monotonic()
     raw = await request.body()
     with SessionLocal() as db:
         org = db.scalar(select(Org).where(Org.slug == slug))
-    if org is None or not TM.verify(org.id, request.headers.get("authorization", ""), raw):
+    if org is None:
+        return JSONResponse({"type": "message", "text": "Unknown Clone Flow organization."}, status_code=404)
+    if not TM.verify(org.id, request.headers.get("authorization", ""), raw):
+        TM.note(org.id, "signature", "A message arrived, but its signature didn't match the saved security token.")
         return JSONResponse({"type": "message", "text": "This Clone Flow connection isn't set up correctly."}, status_code=401)
-    import json as _json
-
-    activity = _json.loads(raw or b"{}")
-    import anyio
-
-    reply = await anyio.to_thread.run_sync(TM.answer, org.id, TM.question_from(activity))
+    try:
+        activity = _json.loads(raw or b"{}")
+        reply = await anyio.to_thread.run_sync(TM.answer, org.id, TM.question_from(activity))
+    except Exception as exc:  # never leave Teams without an answer
+        S.log.exception("teams answer failed")
+        TM.note(org.id, "error", f"Answering failed: {type(exc).__name__}")
+        reply = {"type": "message", "text": "Sorry, I couldn't answer that just now. Please ask again."}
+    else:
+        TM.note(org.id, "ok", f"Answered in {_time.monotonic() - t0:.1f} s")
     return JSONResponse(reply)
 
 

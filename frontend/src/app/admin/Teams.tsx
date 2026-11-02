@@ -79,6 +79,11 @@ export default function Teams() {
             {d?.configured && !replacing ? (
               <div className="mt-3 flex flex-wrap items-center gap-3 rounded-xl bg-sure-bg px-3.5 py-3 text-[13.5px] text-sure">
                 <Check className="h-4 w-4" /> Token saved.
+                {d.last && (
+                  <span className={d.last.status === "ok" ? "text-sure" : "text-[#9B1C1C]"}>
+                    {" "}Last message: {d.last.detail}
+                  </span>
+                )}
                 <button onClick={() => setReplacing(true)} className="ml-auto text-[13px] font-medium text-ink-soft underline decoration-line-strong underline-offset-2 hover:text-ink">
                   Replace token
                 </button>
