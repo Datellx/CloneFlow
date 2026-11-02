@@ -604,10 +604,33 @@ def _image_cards(eid: int, img: Path, note: str, qtext: str) -> list[int]:
     return IV._frame_cards(eid, out, chips, "upload", None)
 
 
+def _spoken(eid: int, video: Path) -> str:
+    """What the person said while sharing their screen (the recording's microphone track), as text."""
+    from backend.media import audio as AU
+
+    try:
+        if not AU.has_audio(video):
+            return ""
+        parts = []
+        for wav, secs in AU.to_wav_chunks(video, video.parent / f"{video.stem}_audio")[:6]:
+            if secs >= 0.8:
+                parts.append(ai.transcribe(eid, wav.read_bytes(), secs))
+        return " ".join(p.strip() for p in parts if p and p.strip())
+    except ai.TrialLimit:
+        raise
+    except Exception as exc:  # the frames still teach something without the words
+        log.warning("screen narration not transcribed: %s", exc)
+        return ""
+
+
 def screen(user: User, video: Path, narration: str) -> None:
     with SessionLocal() as db:
         c = own_clone(db, user)
         eid = c.id
+    if not (narration or "").strip():
+        narration = _spoken(eid, video)
+    with SessionLocal() as db:
+        c = own_clone(db, user)
         q = _current_q(db, eid)
         qid = q.id if q and _state(c).get("stage") == "interview" else None
         say(db, eid, narration or "Shared my screen", role="user", kind="upload",

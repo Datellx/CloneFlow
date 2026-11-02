@@ -126,8 +126,10 @@ What {who} said while showing it:
 Question being answered: {question}
 Return:
 - labels: one 2–6 word label per image saying what it shows ("Torque driver on bench 3").
-- cards: 1–4 knowledge cards a successor needs (location: where something physically is and how to find it;
-  process: ordered steps). "frames": the image indexes that show it. Use only what is visible or said.
+- cards: 1–4 knowledge cards a successor needs (location: where something is and how to find it, a physical place
+  or a file/folder on a computer or shared drive; process: ordered steps). For files and folders, write the full path
+  exactly as shown in the window (title bar, path bar, breadcrumbs) and the exact file names, and say which version is
+  current if they said so. "frames": the image indexes that show it. Use only what is visible or said.
 - narration_back: one spoken sentence confirming what you understood, starting "Got it —"."""
 
 ASK_SCHEMA = {
