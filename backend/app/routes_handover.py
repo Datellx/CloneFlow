@@ -473,6 +473,26 @@ async def teams_webhook(slug: str, request: Request):
     return JSONResponse(reply)
 
 
+@router.get("/admin/diag/ask")
+def admin_diag_ask(q: str = "who do we call at the supplier", ctx: Ctx = Depends(current)):
+    """Admin-only timing of the free answer path (search model, database), to keep Teams inside its 5 s."""
+    import time as _t
+
+    from backend.db.models_knowledge import Card
+    from backend.knowledge import ask as ASK
+    from backend.knowledge.embed import embed
+
+    _admin(ctx)
+    out = {}
+    t = _t.monotonic(); embed([q]); out["embed_s"] = round(_t.monotonic() - t, 3)
+    t = _t.monotonic(); ctx.db.execute(select(func.count()).select_from(Clone)).scalar(); out["db_roundtrip_s"] = round(_t.monotonic() - t, 3)
+    t = _t.monotonic()
+    n = len(ctx.db.scalars(select(Card).where(Card.clone_id.in_(select(Clone.id).where(Clone.org_id == ctx.org.id)))).all())
+    out["load_cards_s"], out["cards"] = round(_t.monotonic() - t, 3), n
+    t = _t.monotonic(); ASK.ask_org(ctx.org.id, q + " ?", None, False); out["ask_org_free_s"] = round(_t.monotonic() - t, 3)
+    return out
+
+
 @router.get("/public/media/{tok}")
 def public_media(tok: str):
     try:
