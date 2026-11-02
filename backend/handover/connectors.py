@@ -150,8 +150,7 @@ def auth_url(provider: str, eid: int, seed: bool = False) -> str:
         scope = GOOGLE_SCOPES + (" https://www.googleapis.com/auth/gmail.insert" if seed else "")
         return "https://accounts.google.com/o/oauth2/v2/auth?" + urlencode({
             "client_id": os.environ["GOOGLE_CLIENT_ID"], "redirect_uri": redirect_uri("google"),
-            "response_type": "code", "scope": scope, "access_type": "offline", "prompt": "consent",
-            "include_granted_scopes": "true", "state": st})
+            "response_type": "code", "scope": scope, "access_type": "offline", "prompt": "consent", "state": st})
     tenant = os.environ.get("MS_TENANT_ID", "organizations")
     return f"https://login.microsoftonline.com/{tenant}/oauth2/v2.0/authorize?" + urlencode({
         "client_id": os.environ["MS_CLIENT_ID"], "redirect_uri": redirect_uri("microsoft"), "response_type": "code",
