@@ -24,7 +24,7 @@ from backend.db.models import Base, Org
 from backend.db.store import SessionLocal
 
 _POOL = cf.ThreadPoolExecutor(max_workers=4)
-REPLY_BUDGET_S = 3.5  # Teams gives an outgoing webhook 5 s in total
+REPLY_BUDGET_S = 3.6  # Teams gives an outgoing webhook 5 s in total
 LAST: dict[int, dict] = {}  # org id → the last message's outcome (shown on the admin's Teams page)
 
 
@@ -100,12 +100,21 @@ def answer(org_id: int, question: str) -> dict:
         return {"type": "message", "text": "Ask me anything your colleagues knew — for example "
                                            "*where are the spare servo horns?*"}
     from backend.knowledge import ai as _ai
-    fut = _POOL.submit(ASK.ask_org, org_id, question, None, not _ai.org_budget(org_id)["reached"])
-    try:
-        res = fut.result(timeout=REPLY_BUDGET_S)
-    except cf.TimeoutError:  # the model is still composing: answer from the best card now (free); cached for next time
+
+    # Teams waits 5 s at most. Start the free answer (best captured card) and the written answer together; send the
+    # written one if it is ready in time, otherwise the free one. The written answer is cached for the next ask.
+    t0 = time.monotonic()
+    quick = _POOL.submit(ASK.ask_org, org_id, question, None, False)
+    full = _POOL.submit(ASK.ask_org, org_id, question, None, True) if not _ai.org_budget(org_id)["reached"] else None
+    res = None
+    if full is not None:
         try:
-            res = _POOL.submit(ASK.ask_org, org_id, question, None, False).result(timeout=1.2)
+            res = full.result(timeout=REPLY_BUDGET_S)
+        except cf.TimeoutError:
+            res = None
+    if res is None:
+        try:
+            res = quick.result(timeout=max(0.2, 4.4 - (time.monotonic() - t0)))
         except cf.TimeoutError:
             return {"type": "message", "text": "Still looking through what your colleagues left behind. Ask me again in a moment."}
     return to_teams(res)

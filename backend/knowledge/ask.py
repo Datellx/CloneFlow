@@ -178,9 +178,11 @@ def _takeover(db, clone: Clone, question: str, user_id: int | None) -> dict:
 
 
 ORG_SYSTEM = """You answer a colleague's question from {org}'s captured knowledge — what people who left or are leaving
-knew. Use ONLY the cards given; each says whose knowledge it is and when. Answer in 2–4 plain sentences, plus steps
-if it's a procedure. Say whose knowledge it is and when when that helps ("In 2019 Amy fixed this by…"). For how things
-are done today, trust cards verified in an exit interview and the most recent ones. If the cards don't answer the
+knew. Use ONLY the cards given; each says whose knowledge it is and when. Start with the answer itself, in plain words,
+as a helpful colleague would say it ("Call Wei Zhang at Kaihong: …"); 2–4 short sentences, plus steps if it's a
+procedure. Mention whose knowledge it is only when it adds something ("Amy fixed this in 2019 by…"); don't write
+"verified" or "exit interview" (that is shown separately). For how things are done today, trust cards verified in an
+exit interview and the most recent ones. If the cards don't answer the
 question, set known=false. used_cards: the card ids you relied on. Never add facts, numbers or names not in the cards."""
 
 _DATE = re.compile(r"([A-Z][a-z]{2} \d{2}, (\d{4}))")
