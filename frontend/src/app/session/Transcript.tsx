@@ -118,7 +118,20 @@ function Rich({
       const cards = (m.payload as { cards?: Card[] })?.cards || [];
       return (
         <div className="mt-2 space-y-1.5">
-          {cards.map((c) => <CardPill key={c.id} card={c} />)}
+          {cards.map((c) => {
+            // what was seen (screen, video, phone): one tap opens the frame and the clip at that moment
+            const seen = (c.sources || []).filter((x) => x.frame_url && (x.kind === "screen" || x.kind === "floor")).slice(0, 2);
+            return (
+              <div key={c.id} className="space-y-1">
+                <CardPill card={c} />
+                {seen.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 pl-1">
+                    {seen.map((x, i) => <ProofChip key={i} proof={x} onOpen={onOpen} className="!text-[12px]" />)}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       );
     }
