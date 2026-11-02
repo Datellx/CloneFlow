@@ -22,7 +22,9 @@ def test_teams_webhook():
         assert not t["configured"] and t["webhook_url"].endswith(f"/api/teams/webhook/{slug}")
         assert c.post("/api/admin/teams", json={"secret": "not base64!!"}).status_code == 400
         secret = base64.b64encode(os.urandom(32)).decode()
-        assert c.post("/api/admin/teams", json={"secret": secret}).json()["configured"]
+        # pasted from the Teams dialog with a line break and an invisible mark: still accepted, stored clean
+        messy = "\u200e " + secret[:20] + "\n" + secret[20:] + " \n"
+        assert c.post("/api/admin/teams", json={"secret": messy}).json()["configured"]
         body = json.dumps({"type": "message", "text": "<at>Clone Flow</at> where is the calibration jig?"}).encode()
         sig = base64.b64encode(hmac.new(base64.b64decode(secret), body, hashlib.sha256).digest()).decode()
         r = c.post(f"/api/teams/webhook/{slug}", content=body, headers={"Authorization": f"HMAC {sig}"})

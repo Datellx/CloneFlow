@@ -427,11 +427,17 @@ def admin_teams_save(body: TeamsSecretIn, ctx: Ctx = Depends(current)):
     _admin(ctx)
     import base64 as _b64
 
+    import re as _re
+
+    # Copying from Teams can bring along spaces, line breaks or invisible formatting marks: keep only base64 letters.
+    secret = _re.sub(r"[^A-Za-z0-9+/=]", "", body.secret or "")
     try:
-        _b64.b64decode(body.secret.strip(), validate=True)
-    except Exception as exc:
-        raise HTTPException(400, "That doesn't look like a Teams security token — copy it again from Teams.") from exc
-    TM.save_secret(ctx.org.id, body.secret)
+        key = _b64.b64decode(secret + "=" * (-len(secret) % 4), validate=True)
+    except Exception:
+        key = b""
+    if len(key) < 16:
+        raise HTTPException(400, "That doesn't look like a Teams security token — copy it again from Teams.")
+    TM.save_secret(ctx.org.id, secret)
     return admin_teams(ctx)
 
 
