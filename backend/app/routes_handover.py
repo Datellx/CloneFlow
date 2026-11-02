@@ -489,7 +489,9 @@ def admin_diag_ask(q: str = "who do we call at the supplier", ctx: Ctx = Depends
     t = _t.monotonic()
     n = len(ctx.db.scalars(select(Card).where(Card.clone_id.in_(select(Clone.id).where(Clone.org_id == ctx.org.id)))).all())
     out["load_cards_s"], out["cards"] = round(_t.monotonic() - t, 3), n
-    t = _t.monotonic(); ASK.ask_org(ctx.org.id, q + " ?", None, False); out["ask_org_free_s"] = round(_t.monotonic() - t, 3)
+    t = _t.monotonic(); r = ASK.ask_org(ctx.org.id, q + " ?", None, False); out["ask_org_free_s"] = round(_t.monotonic() - t, 3)
+    out["steps"] = dict(ASK.TIMING)
+    out["known"] = r.get("known")
     return out
 
 

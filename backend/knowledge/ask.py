@@ -216,9 +216,24 @@ def _card_year(c: Card) -> str:
     return max(years) if years else ""
 
 
+TIMING: dict[str, float] = {}
+
+
+def _mark(name: str, t0: list) -> None:
+    import time as _t
+
+    now = _t.monotonic()
+    TIMING[name] = round(now - t0[0], 3)
+    t0[0] = now
+
+
 def ask_org(org_id: int, question: str, user_id: int | None = None, allow_ai: bool = True) -> dict:
     """'Ask everyone': search every captured pack in the organization (local, free), then answer once from the best
     cards across people — so history ("Amy solved this in 2019") and current practice come together."""
+    import time as _t
+
+    T = [_t.monotonic()]
+    TIMING.clear()
     with SessionLocal() as db:
         clones = {c.id: c for c in db.scalars(select(Clone).where(Clone.org_id == org_id))}
         pool = []
@@ -226,6 +241,7 @@ def ask_org(org_id: int, question: str, user_id: int | None = None, allow_ai: bo
             for sc, card in retrieve(db, c.id, question, k=3):
                 pool.append((sc, card))
         pool.sort(key=lambda x: -x[0])
+        _mark("retrieve", T)
         if not pool:
             return {"id": None, "question": question, "known": False, "mode": "question", "eid": None,
                     "answer": "No one's knowledge has been captured yet.", "steps": [], "cards": [], "proofs": [],
@@ -242,6 +258,7 @@ def ask_org(org_id: int, question: str, user_id: int | None = None, allow_ai: bo
         version = sum(_version(db, e) for e in per) & 0xFFFFFF
         key = "org" + qkey(org_id, question, "org", version)[:56] + ("" if allow_ai and ai.ai_ready() else "x")
         hit = db.scalar(select(AskV2).where(AskV2.clone_id == best_eid, AskV2.qkey == key).limit(1))
+        _mark("version_and_cache", T)
         if hit:
             ans = dict(hit.answer)
             ans.update({"id": hit.id, "question": question, "cached": True, "cost_usd": 0.0})
@@ -273,6 +290,7 @@ def ask_org(org_id: int, question: str, user_id: int | None = None, allow_ai: bo
         if other:
             answer += f" Earlier, {other[6].split()[0]}{' (' + other[7] + ')' if other[7] else ''}: {other[2]}."
             used.append(other[0])
+    _mark("compose", T)
     with SessionLocal() as db:
         used_cards = [db.get(Card, i) for i in used if db.get(Card, i)]
         proofs = []
@@ -287,6 +305,7 @@ def ask_org(org_id: int, question: str, user_id: int | None = None, allow_ai: bo
             answer = "I don't know — no one covered this in what they left behind, so I won't guess."
             ask_person = _who_to_ask(db, best_eid, question, clone_name=clones[best_eid].expert_name)
             _remember_unknown(db, best_eid, question)
+            _mark("who_to_ask", T)
         result = {"question": question, "known": known, "answer": answer, "steps": steps,
                   "eid": used_cards[0].clone_id if used_cards else best_eid,
                   "from_name": " and ".join(n.split()[0] for n in names) if names else clones[best_eid].expert_name,
@@ -298,4 +317,5 @@ def ask_org(org_id: int, question: str, user_id: int | None = None, allow_ai: bo
         db.add(row)
         db.commit()
         result["id"] = row.id
+        _mark("cards_and_save", T)
         return result
