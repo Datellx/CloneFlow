@@ -47,6 +47,14 @@ def google_handler(req: httpx.Request) -> httpx.Response:
 
 def graph_handler(req: httpx.Request) -> httpx.Response:
     p = req.url.path.replace("/v1.0", "")
+    if p == "/me/events":
+        return httpx.Response(200, json={"value": [
+            {"id": "e1", "iCalUId": "ev1", "subject": "Line 2 calibration review", "isCancelled": False,
+             "organizer": {"emailAddress": {"name": "Rosa", "address": "rosa@wrenfield.example"}}, "attendees": [],
+             "start": {"dateTime": "2025-03-04T15:00:00.0000000"}, "location": {"displayName": "Bench 3"},
+             "body": {"content": "Agreed: recalibrate wrist_roll after every servo swap; Tyler owns the checklist."}},
+            {"id": "e2", "subject": "Lunch", "isCancelled": False, "organizer": {"emailAddress": {}}, "attendees": [],
+             "start": {"dateTime": "2025-03-05T17:00:00.0000000"}, "body": {"content": ""}}]})
     if p == "/me/mailFolders":
         return httpx.Response(200, json={"value": [{"id": "f1", "displayName": "Inbox"}]})
     if p == "/me/messages":
@@ -109,7 +117,7 @@ def test_imports(monkeypatch):
         patch(graph_handler)
         CN.save_token(eid, "microsoft", {"access_token": "t", "expires_at": 9e12})
         counts = CN._import_microsoft(eid)
-        assert counts == {"emails": 1, "chats": 2, "files": 1}, counts
+        assert counts == {"emails": 1, "meetings": 1, "chats": 2, "files": 1}, counts
     finally:
         httpx.Client = _RealClient
     with SessionLocal() as db:

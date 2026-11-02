@@ -38,12 +38,12 @@ const PROVIDER_ICON: Record<string, ReactNode> = {
 
 /** What each source is, in the founder's words; unknown keys fall back to what the server sends. */
 const PROVIDER_COPY: Record<string, { name: string; note: string }> = {
-  microsoft: { name: "Microsoft 365", note: "Outlook mail and Teams chats" },
+  microsoft: { name: "Microsoft 365", note: "Outlook mail, meetings and Teams" },
   gmail: { name: "Gmail", note: "Work email" },
   github: { name: "GitHub", note: "Repositories" },
 };
 const COUNT_LABEL: Record<string, [string, string]> = {
-  emails: ["email", "emails"], chats: ["chat", "chats"], files: ["file", "files"], repos: ["repository", "repositories"],
+  emails: ["email", "emails"], meetings: ["meeting", "meetings"], chats: ["chat", "chats"], files: ["file", "files"], repos: ["repository", "repositories"],
   repositories: ["repository", "repositories"], prs: ["pull request", "pull requests"], pull_requests: ["pull request", "pull requests"],
   docs: ["doc", "docs"], readmes: ["README", "READMEs"], issues: ["issue", "issues"],
 };

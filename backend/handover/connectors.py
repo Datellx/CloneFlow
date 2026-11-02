@@ -60,14 +60,14 @@ class ConnectorToken(Base):
 # ---------------------------------------------------------------- config
 PROVIDERS = {
     "google": {"label": "Gmail", "note": "Your work email", "kinds": ["email"]},
-    "microsoft": {"label": "Microsoft 365", "note": "Outlook mail and Teams chats", "kinds": ["email", "chat", "files"]},
+    "microsoft": {"label": "Microsoft 365", "note": "Outlook mail, meetings and Teams chats", "kinds": ["email", "chat", "files"]},
     "github": {"label": "GitHub", "note": "Repositories: docs, READMEs, pull requests", "kinds": ["files", "chat"]},
 }
 GITHUB_SCOPES = "repo read:user"
 MAX_REPOS = int(os.environ.get("CONNECT_MAX_REPOS", "8"))
 GOOGLE_SCOPES = "openid email https://www.googleapis.com/auth/gmail.readonly"
 MS_SCOPES = ("offline_access openid email User.Read Mail.Read Chat.Read ChannelMessage.Read.All Team.ReadBasic.All "
-             "Channel.ReadBasic.All Files.Read.All")
+             "Channel.ReadBasic.All Files.Read.All Calendars.Read")
 
 
 def configured(provider: str) -> bool:
@@ -360,7 +360,7 @@ def _paged(cx: httpx.Client, url: str, params: dict | None = None, limit: int = 
 def _import_microsoft(eid: int) -> dict:
     tok = _token(eid, "microsoft")
     h = {"Authorization": f"Bearer {tok['access_token']}", "Prefer": 'outlook.body-content-type="text"'}
-    counts = {"emails": 0, "chats": 0, "files": 0}
+    counts = {"emails": 0, "meetings": 0, "chats": 0, "files": 0}
     with httpx.Client(timeout=60, headers=h) as cx:
         folders = {f["id"]: f["displayName"] for f in _paged(cx, f"{GRAPH}/me/mailFolders", {"$top": 50}, 200)}
         msgs = _paged(cx, f"{GRAPH}/me/messages", {"$top": 50, "$select": "id,internetMessageId,subject,from,toRecipients,"
@@ -385,6 +385,33 @@ def _import_microsoft(eid: int) -> dict:
                         em[hd["name"]] = hd.get("value", "")
                 em.set_content((m.get("body") or {}).get("content", ""))
                 counts["emails"] += SRC._add_mail(db, eid, em, folders.get(m.get("parentFolderId"), "Inbox"), seen)
+            db.commit()
+        # Outlook calendar: meetings carry who met, about what, and the agenda / notes in the body
+        events = _paged(cx, f"{GRAPH}/me/events", {"$top": 50, "$orderby": "start/dateTime desc", "$select":
+                        "id,iCalUId,subject,organizer,attendees,start,end,location,body,isCancelled,isAllDay"}, MAX_MAIL)
+        with SessionLocal() as db:
+            seen = {i for (i,) in db.execute(select(SourceItem.ext_id).where(SourceItem.clone_id == eid, SourceItem.kind == "mail"))}
+            for ev in events:
+                if ev.get("isCancelled"):
+                    continue
+                notes = (ev.get("body") or {}).get("content", "").strip()
+                if len(notes) < 40:  # an empty invite says nothing worth keeping
+                    continue
+                org = ((ev.get("organizer") or {}).get("emailAddress")) or {}
+                who = [a["emailAddress"] for a in ev.get("attendees", []) if a.get("emailAddress")]
+                start = (ev.get("start") or {}).get("dateTime", "")
+                em = EmailMessage()
+                em["From"] = f'{org.get("name", "")} <{org.get("address", "")}>'
+                em["To"] = ", ".join(f'{w.get("name", "")} <{w.get("address", "")}>' for w in who)
+                em["Subject"] = f'Meeting: {ev.get("subject") or "(no subject)"}'
+                em["Message-ID"] = f'<event-{ev.get("iCalUId") or ev["id"]}>'
+                if start:
+                    em["Date"] = datetime.fromisoformat(start[:19]).strftime("%a, %d %b %Y %H:%M:%S +0000")
+                loc = (ev.get("location") or {}).get("displayName", "")
+                names = ", ".join(w.get("name", "") for w in who if w.get("name"))
+                head = "Meeting" + (f" in {loc}" if loc else "") + (f" with {names}" if names else "")
+                em.set_content(f"{head}.\n\n{notes}")
+                counts["meetings"] += SRC._add_mail(db, eid, em, "Calendar", seen)
             db.commit()
         # Teams: 1:1 / group chats, then channels
         chat_rows: list[tuple[str, str, str, list, dict]] = []
