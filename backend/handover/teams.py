@@ -25,7 +25,8 @@ from backend.db.store import SessionLocal
 
 _POOL = cf.ThreadPoolExecutor(max_workers=4)
 REPLY_BUDGET_S = 3.6  # Teams gives an outgoing webhook 5 s in total
-LAST: dict[int, dict] = {}  # org id → the last message's outcome (shown on the admin's Teams page)
+LAST: dict[int, dict] = {}
+LAST_HOW: dict[int, str] = {}  # org id → the last message's outcome (shown on the admin's Teams page)
 
 
 def note(org_id: int, status: str, detail: str) -> None:
@@ -106,17 +107,20 @@ def answer(org_id: int, question: str) -> dict:
     t0 = time.monotonic()
     quick = _POOL.submit(ASK.ask_org, org_id, question, None, False)
     full = _POOL.submit(ASK.ask_org, org_id, question, None, True) if not _ai.org_budget(org_id)["reached"] else None
-    res = None
+    res, how = None, "written answer"
     if full is not None:
         try:
             res = full.result(timeout=REPLY_BUDGET_S)
         except cf.TimeoutError:
             res = None
     if res is None:
+        how = "quick answer (the written one was still coming)"
         try:
             res = quick.result(timeout=max(0.2, 4.4 - (time.monotonic() - t0)))
         except cf.TimeoutError:
+            LAST_HOW[org_id] = "too slow: nothing was ready in time"
             return {"type": "message", "text": "Still looking through what your colleagues left behind. Ask me again in a moment."}
+    LAST_HOW[org_id] = how + (" from cache" if res.get("cached") else "")
     return to_teams(res)
 
 

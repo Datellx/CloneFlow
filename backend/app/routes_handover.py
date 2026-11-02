@@ -469,7 +469,7 @@ async def teams_webhook(slug: str, request: Request):
         TM.note(org.id, "error", f"Answering failed: {type(exc).__name__}")
         reply = {"type": "message", "text": "Sorry, I couldn't answer that just now. Please ask again."}
     else:
-        TM.note(org.id, "ok", f"Answered in {_time.monotonic() - t0:.1f} s")
+        TM.note(org.id, "ok", f"Answered in {_time.monotonic() - t0:.1f} s · {TM.LAST_HOW.get(org.id, '')}")
     return JSONResponse(reply)
 
 

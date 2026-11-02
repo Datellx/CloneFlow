@@ -43,6 +43,18 @@ def _startup() -> None:
     log.info("Clone Flow ready · model provider=%s", settings.llm_provider)
     if settings.llm_provider == "mock":
         log.warning("Running with the OFFLINE MOCK model provider. Set MODEL_API_KEY to use the Meta Model API.")
+    import threading
+
+    def _warm() -> None:  # load the search model now, so the first question (e.g. from Teams, 5 s limit) is fast
+        import time
+
+        from backend.knowledge.embed import embed
+
+        t0 = time.monotonic()
+        embed(["warm up"])
+        log.info("search model ready in %.1f s", time.monotonic() - t0)
+
+    threading.Thread(target=_warm, daemon=True, name="warm-embed").start()
 
 
 app.include_router(account_router)
