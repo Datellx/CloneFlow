@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import logging
 import mimetypes
+import os
 import re
 import shutil
 import uuid
@@ -563,13 +564,52 @@ def _state_stage(eid: int) -> str:
         return _state(db.get(Clone, eid)).get("stage", "intro")
 
 
+SAM_CONCEPTS = {"type": "object", "properties": {"objects": {"type": "array", "items": {"type": "string"}}},
+                "required": ["objects"]}
+
+
+def _sam_concepts(eid: int, said: str, qtext: str) -> list[str]:
+    """1–3 short noun phrases for the physical things being worked on (SAM 3.1 prompts), from what was said."""
+    try:
+        out = ai.call_json("sam_concepts", eid, "You pick what to track in a work video. Return 1-3 short noun phrases "
+                           "(2-3 words, singular, concrete physical objects or parts) for the things the person is "
+                           "handling, most important first. Prefer the whole machine first, then the part that moves.",
+                           f"They said: {ai.redact(said or '(nothing)')}\nQuestion: {qtext or '(none)'}",
+                           SAM_CONCEPTS, "SamConcepts")
+        objs = [o.strip().lower()[:40] for o in (out.get("objects") or []) if o and o.strip()]
+    except ai.TrialLimit:
+        raise
+    except Exception:
+        objs = []
+    return objs[:3] or ["robot arm", "hand"]
+
+
 def _video_cards(eid: int, video: Path, narration: str, qtext: str) -> list[int]:
+    """A physical task on video: SAM 3.1 tracks what is being worked on, the keyframes are where it moves (masks drawn
+    on), Muse Voice Transcribe hears what was said, and Muse Spark vision turns frames + words into steps."""
     from backend.media import frames as vf
 
     out_dir = IV.media_dir(eid, f"uploads/{uuid.uuid4().hex[:8]}")
     clip = out_dir / video.name
     shutil.copy2(video, clip)
-    frames = vf.keyframes(clip, out_dir, max_frames=8, max_side=1280)
+    said = narration or _spoken(eid, clip)
+    frames, tracked, sam_info = [], None, None
+    if settings.llm_provider != "mock" and os.environ.get("SAM_ENABLED", "1") != "0":
+        try:
+            from backend.media import sam as SAM
+
+            concepts = _sam_concepts(eid, said, qtext)
+            tr = SAM.track(clip, out_dir, concepts)
+            SAM.bill(eid, tr)
+            if any(tr.found().values()):
+                frames, tracked = SAM.render(tr, out_dir, SAM.keyframes(tr))
+                sam_info = SAM.summary(tr)
+        except ai.TrialLimit:
+            raise
+        except Exception as exc:  # SAM is an enhancement: plain keyframes still work
+            log.warning("SAM 3.1 tracking skipped: %s", exc)
+    if not frames:
+        frames = vf.keyframes(clip, out_dir, max_frames=8, max_side=1280)
     for f in frames:
         for box in vf.local_faces(f):
             vf.blur_boxes(f, [box])
@@ -577,12 +617,19 @@ def _video_cards(eid: int, video: Path, narration: str, qtext: str) -> list[int]
         return []
     with SessionLocal() as db:
         who = _first(db.get(Clone, eid).expert_name)
-    prompt = P.FRAMES_PROMPT.format(who=who, what="a video they recorded", n=len(frames), last=len(frames) - 1,
-                                    said=ai.redact(narration or "(no narration)"), question=qtext)
+    what = "a video they recorded"
+    if sam_info:
+        what += (" (the coloured masks are SAM 3.1 tracking " + ", ".join(k for k, v in sam_info["found"].items() if v)
+                 + "; the keyframes are where it moves)")
+    prompt = P.FRAMES_PROMPT.format(who=who, what=what, n=len(frames), last=len(frames) - 1,
+                                    said=ai.redact(said or "(no narration)"), question=qtext)
     out = ai.call_vision("frames", eid, prompt, [f.read_bytes() for f in frames], P.FRAMES_SCHEMA, "V2Frames")
     labels = out.get("labels") or []
-    chips = [{"kind": "floor", "ref": IV.media_url(clip), "video_url": IV.media_url(clip), "frame_url": IV.media_url(f),
-              "label": f"Video · {labels[i] if i < len(labels) else f'frame {i + 1}'}", "timestamp_s": vf.frame_time(f)}
+    shown = tracked or clip
+    tag = "Video · SAM 3.1" if sam_info else "Video"
+    chips = [{"kind": "floor", "ref": IV.media_url(shown), "video_url": IV.media_url(shown), "frame_url": IV.media_url(f),
+              "label": f"{tag} · {labels[i] if i < len(labels) else f'frame {i + 1}'}",
+              "timestamp_s": (int(f.stem.rsplit('_', 1)[-1]) / sam_info["fps"]) if sam_info else vf.frame_time(f)}
              for i, f in enumerate(frames)]
     return IV._frame_cards(eid, out, chips, "upload", None)
 
