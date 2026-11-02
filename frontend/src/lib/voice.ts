@@ -10,6 +10,10 @@ let serverTtsUnavailable = false;
 export function configureTts(provider: string) {
   serverTtsUnavailable = provider === "browser";
 }
+/** True when lines are spoken by the server's voice (ElevenLabs), not the browser's. */
+export function serverVoice() {
+  return !serverTtsUnavailable;
+}
 const listeners = new Set<(speaking: boolean) => void>();
 function emit(v: boolean) {
   listeners.forEach((l) => l(v));
@@ -58,6 +62,8 @@ export function stop() {
 interface SpeakOptions {
   /** Fired on each word boundary (browser voices only) with the character index being spoken. */
   onBoundary?: (charIndex: number) => void;
+  /** Server voice: fired as the audio plays, with how far through it is (0..1), so captions follow the voice. */
+  onProgress?: (fraction: number) => void;
 }
 
 function browserSpeak(text: string, opts: SpeakOptions = {}): Promise<void> {
@@ -108,11 +114,21 @@ export async function speak(text: string, opts: SpeakOptions = {}): Promise<void
         const audio = new Audio(currentUrl);
         currentAudio = audio;
         emit(true);
+        let raf = 0;
+        const tick = () => {
+          if (audio.duration > 0 && isFinite(audio.duration)) opts.onProgress?.(Math.min(1, audio.currentTime / audio.duration));
+          raf = requestAnimationFrame(tick);
+        };
         await new Promise<void>((resolve) => {
+          audio.onplaying = () => {
+            cancelAnimationFrame(raf);
+            tick();
+          };
           audio.onended = () => resolve();
           audio.onerror = () => resolve();
           audio.play().catch(() => resolve());
         });
+        cancelAnimationFrame(raf);
         if (currentAudio === audio) stop();
         return;
       }

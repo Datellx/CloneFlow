@@ -27,6 +27,10 @@ services:
         generateValue: true
       - key: MODEL_API_KEY    # Meta Model API key
         sync: false
+      - key: ELEVENLABS_API_KEY     # the interviewer's voice
+        sync: false
+      - key: TTS_VOICE              # optional ElevenLabs voice id
+        sync: false
       - key: PUBLIC_URL       # this service's address, e.g. https://cloneflow-engine.onrender.com
         sync: false
       # Supabase: sign-in + email (Auth) and the Postgres database

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { friendlyMediaError, speak, stop as stopSpeech } from "@/lib/voice";
+import { friendlyMediaError, serverVoice, speak, stop as stopSpeech } from "@/lib/voice";
 import type { OrbState } from "./Orb";
 
 /* ------------------------------------------------------------------ voice + captions */
@@ -29,8 +29,10 @@ export function useInterviewer() {
     let gotBoundary = false;
     let simulated = 0;
     // Word-by-word caption reveal, driven by speech boundaries when available, else timed.
+    const startedAt = Date.now();
     const sim = window.setInterval(() => {
       if (gotBoundary || token.current !== my) return;
+      if (serverVoice() && Date.now() - startedAt < 1500) return; // give the server voice a moment to start
       simulated += 1;
       const idx = nthWordEnd(text, simulated);
       setSpoken(idx);
@@ -48,12 +50,26 @@ export function useInterviewer() {
       return;
     }
     const fallback = new Promise<void>((r) => setTimeout(r, estimate * 1.6 + 1500));
+    let lastIdx = -1;
     const real = speak(text, {
       onBoundary: (ci) => {
         if (token.current !== my) return;
         gotBoundary = true;
         setSpoken(text.indexOf(" ", ci + 1) < 0 ? text.length : text.indexOf(" ", ci + 1));
         setPulse((p) => p + 1);
+      },
+      // Server voice (ElevenLabs): follow the audio itself, word by word.
+      onProgress: (f) => {
+        if (token.current !== my) return;
+        gotBoundary = true;
+        const at = Math.floor(f * text.length);
+        const end = text.indexOf(" ", at);
+        const idx = f >= 0.995 || end < 0 ? text.length : end;
+        if (idx !== lastIdx) {
+          lastIdx = idx;
+          setSpoken(idx);
+          setPulse((p) => p + 1);
+        }
       },
     }).catch(() => undefined);
     await Promise.race([real, fallback]);

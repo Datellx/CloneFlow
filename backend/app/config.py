@@ -60,8 +60,11 @@ class Settings:
     transcribe_model: str = field(default_factory=lambda: os.environ.get("TRANSCRIBE_MODEL", "muse-voice-transcribe-1.0"))
     max_concurrency: int = field(default_factory=lambda: int(os.environ.get("LLM_MAX_CONCURRENCY", "24")))
 
-    tts_provider: str = field(default_factory=lambda: os.environ.get("TTS_PROVIDER", "browser").strip().lower())
-    tts_api_key: str = field(default_factory=lambda: os.environ.get("TTS_API_KEY", ""))
+    # Voice: ElevenLabs when its key is set (ELEVENLABS_API_KEY, or TTS_API_KEY with TTS_PROVIDER), else the browser's.
+    tts_provider: str = field(default_factory=lambda: (os.environ.get("TTS_PROVIDER", "").strip().lower()
+                                                       or ("elevenlabs" if os.environ.get("ELEVENLABS_API_KEY") else "browser")))
+    tts_api_key: str = field(default_factory=lambda: (os.environ.get("TTS_API_KEY", "").strip()
+                                                      or os.environ.get("ELEVENLABS_API_KEY", "").strip()))
     tts_voice: str = field(default_factory=lambda: os.environ.get("TTS_VOICE", ""))
 
     database_url: str = field(default_factory=lambda: os.environ.get("DATABASE_URL", ""))
