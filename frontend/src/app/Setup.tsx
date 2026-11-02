@@ -47,14 +47,18 @@ function SetupChat({ initial, first }: { initial: SetupState; first: string }) {
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  const lastAssistant = useMemo(() => [...msgs].reverse().find((m) => m.role === "assistant" && !m.payload?.invites), [msgs]);
+  const lastAssistant = useMemo(() => [...msgs].reverse().find((m) => m.role === "assistant" && !m.payload?.invites && !m.payload?.updated), [msgs]);
   // The assistant's newest words are the caption under the orb; everything before (and invitations) is history.
   const history = useMemo(() => {
     const lastUser = msgs.map((m) => m.role).lastIndexOf("user");
     if (lastUser < 0) return [];
-    return [...msgs.slice(0, lastUser + 1), ...msgs.slice(lastUser + 1).filter((m) => m.payload?.invites || m.payload?.problem)];
+    return [...msgs.slice(0, lastUser + 1), ...msgs.slice(lastUser + 1).filter((m) => m.payload?.invites || m.payload?.updated || m.payload?.problem)];
   }, [msgs]);
-  const invites = useMemo(() => msgs.flatMap((m) => m.payload?.invites ?? []), [msgs]);
+  // Everyone named in this conversation: new invitations, and people who were already invited (details updated).
+  const invites = useMemo(() => {
+    const all = msgs.flatMap((m) => [...(m.payload?.invites ?? []), ...(m.payload?.updated ?? []).map((name) => ({ name, email: "" }))]);
+    return all.filter((p, i) => all.findIndex((q) => q.name.toLowerCase() === p.name.toLowerCase()) === i);
+  }, [msgs]);
 
   // Speak the newest assistant line (the greeting is two lines: say both).
   const spokenId = useRef<number | null>(null);

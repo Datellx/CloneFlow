@@ -42,10 +42,12 @@ def test_handover_end_to_end():
         ov = c.get("/api/admin/overview").json()
         assert ov["org"]["profile"]["critical_areas"] and ov["plan"]["used"] == 1 and ov["plan"]["left"] == 2
         # starting the setup chat over keeps people; naming an invited person again updates instead of re-inviting
-        st = c.post("/api/setup/restart").json()
+        assert c.post("/api/setup/restart").json()["ok"]
+        st = c.get("/api/setup").json()
         assert len(st["messages"]) == 2 and not st["done"]
         r = c.post("/api/setup/message", json={"text": "Avery Brooks, avery@northwind.example, leaves Dec 16"}).json()
         assert not any((m["payload"] or {}).get("invites") for m in r["messages"])
+        assert any((m["payload"] or {}).get("updated") for m in r["messages"])
         assert c.get("/api/admin/overview").json()["plan"]["used"] == 1
         for text in ("We build robot arms for university labs and small factories.",
                      "Calibration know-how, supplier contacts, firmware decisions",

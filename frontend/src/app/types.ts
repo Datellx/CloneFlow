@@ -103,7 +103,7 @@ export interface SetupMsg {
   id: number;
   role: "assistant" | "user";
   text: string;
-  payload: { invites?: { name: string; email: string; link: string; eid: number }[]; problem?: boolean; done?: boolean } | null;
+  payload: { invites?: { name: string; email: string; link: string; eid: number }[]; updated?: string[]; problem?: boolean; done?: boolean } | null;
   at: string | null;
 }
 export interface SetupState {

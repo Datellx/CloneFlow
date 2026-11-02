@@ -100,6 +100,12 @@ def state(user: User) -> dict:
             _say(db, org.id, f"To start: what does {org.name} do? What do you make or provide, and for whom?")
             db.commit()
             msgs = db.scalars(select(SetupMsg).where(SetupMsg.org_id == org.id).order_by(SetupMsg.id)).all()
+            # Two first loads at once can both greet; keep the earliest greeting only.
+            if len(msgs) > 2 and all(m.role == "assistant" for m in msgs):
+                for m in msgs[2:]:
+                    db.delete(m)
+                db.commit()
+                msgs = msgs[:2]
         prof = org.profile or {}
         return {"org": org.name, "done": bool(prof.get("done")), "profile": {k: prof.get(k) for k in PROFILE_KEYS},
                 "messages": [_msg(m) for m in msgs], "plan": _plan(db, org),
@@ -202,7 +208,7 @@ def restart(user: User) -> dict:
             db.delete(m)
         org.profile = {}
         db.commit()
-    return state(user)
+    return {"ok": True}
 
 
 def finish(user: User, skipped: bool = False) -> dict:
