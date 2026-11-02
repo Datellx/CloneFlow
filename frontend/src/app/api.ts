@@ -21,6 +21,7 @@ export const handover = {
   skip: () => post<T.SessionReply>("/me/session/skip"),
   read: () => post<T.SessionReply>("/me/session/read"),
   finish: () => post<T.SessionReply>("/me/session/finish"),
+  reopen: () => post<T.SessionReply>("/me/session/reopen"),
   upload: (files: File[], note?: string) => {
     const f = new FormData();
     files.forEach((file) => f.append("files", file, file.name));

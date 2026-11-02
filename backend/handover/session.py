@@ -142,6 +142,8 @@ def _actions(stage: str, db, eid: int) -> list[dict]:
     if stage == "open":
         return [{"type": "answer"}, {"type": "add", "modes": ["screen", "upload", "phone"]},
                 {"type": "finish", "label": "I'm done"}]
+    if stage == "done":  # "You can come back any time to add more"
+        return [{"type": "reopen", "label": "Add something I forgot"}]
     return []
 
 
@@ -755,6 +757,18 @@ def finish(user: User) -> None:
                      f"and it will say when it doesn't know. You can come back any time to add more.")
         _set_state(c, stage="done")
         core.set_status(c, "captured")
+        db.commit()
+
+
+def reopen(user: User) -> None:
+    """Back after finishing: open the conversation again so they can talk, type, upload or show more."""
+    with SessionLocal() as db:
+        c = own_clone(db, user)
+        if _state(c).get("stage") != "done":
+            return
+        _set_state(c, stage="open")
+        say(db, c.id, f"Welcome back, {_first(c.expert_name)}. What did you remember? Tell me, or use Show me to share "
+                      f"your screen or upload a video.")
         db.commit()
 
 

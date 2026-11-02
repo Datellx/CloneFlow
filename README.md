@@ -1,5 +1,18 @@
 # Clone Flow
 
+## Meta Global AI Hackathon 2026 — Submission Overview
+
+- **Track & problem statement**: Startup (Datellx LLC) · Build for Your World
+- **Hackathon provenance (Oct 26 – Nov 4, 2026)**: built 100% from scratch during the hackathon window. No code existed before Oct 26.
+- **Meta AI runtime models** (all through the Meta Model API, `api.meta.ai`):
+  - `muse-spark-1.3` — low reasoning effort reads email, meetings and chats into knowledge cards and answers in Teams; high effort finds the gaps, plans the interview and writes the briefing; vision reads screen shares, photos and video keyframes
+  - `muse-voice-transcribe-1.0` — hears what the person says while they show something
+  - `sam-3.1` — segments and tracks the physical task in uploaded videos (e.g. calibrating a robot arm); Muse Spark picks what to track from the person's own words
+- **Bonus categories targeted**: Best Agentic Use-Case (multi-step: read → find gaps → interview → answer with proof)
+- **3-minute demo video**: _link added at submission_
+- **Live app**: https://cloneflow-engine.onrender.com
+- **Quickstart**: `cp .env.example .env.local`, set `MODEL_API_KEY` (your Meta Model API key), then `./run.sh` → http://localhost:8000 (tests: `pytest -q`)
+
 **When people leave, their knowledge stays.**
 
 Clone Flow is a web application for companies. When an employee gives notice, the company admin invites them to
@@ -50,10 +63,24 @@ All model calls go through one module, [`backend/knowledge/ai.py`](backend/knowl
 | Planning the interview, takeover briefing | `muse-spark-1.3`, high effort | once per handover |
 | Screen share, video, phone walk, photos | `muse-spark-1.3` vision | one call per clip |
 | Voice answers | `muse-voice-transcribe-1.0` | per recording |
+| Uploaded videos of physical work | `sam-3.1` (video segmentation + tracking), then `muse-spark-1.3` vision on the marked-up keyframes | one upload per video, up to 3 concepts |
 
 Spending is deliberate: noise, newsletters, duplicates, recurring reminders and personal mail are removed in code
 before anything reaches the model; retrieval and "I don't know" decisions use local embeddings
 (`bge-small-en-v1.5`, on the server); repeated questions are cached.
+
+## Benchmarks (live product, Nov 2, 2026)
+
+Measured on a full handover (Maya, a robotics engineer, five years of Gmail, Outlook mail and meetings, and Teams):
+
+| Metric | Result |
+|---|---|
+| Messages read in one pass | 394 emails and meetings + 232 Teams messages |
+| Personal emails kept away from the model (code filter) | 9 of 9; 0 work emails wrongly removed |
+| Teams answer latency, 10 live questions | median 4.0 s, p90 5.0 s; "I don't know" in 0.6 s with no model call |
+| Meta API cost of the whole handover (per-call log) | $0.93; about $0.004 per answer |
+| Automated tests | 11 / 11 pass (`pytest -q`) |
+
 
 ## Privacy
 

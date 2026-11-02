@@ -93,6 +93,12 @@ def test_handover_end_to_end():
         c.post("/api/me/session/message", json={"text": "Also: the spare horns are in bin C4 under bench 2, refill them every Friday."})
         r = c.post("/api/me/session/finish").json()
         assert r["session"]["stage"] == "done" and any(m["kind"] == "summary" for m in r["messages"])
+        # coming back later to add something re-opens the conversation, then finishing again is possible
+        assert [a["type"] for a in r["session"]["actions"]] == ["reopen"]
+        r = c.post("/api/me/session/reopen").json()
+        assert r["session"]["stage"] == "open" and any(a["type"] == "add" for a in r["session"]["actions"])
+        r = c.post("/api/me/session/finish").json()
+        assert r["session"]["stage"] == "done"
         # a departing employee sees only their own handover
         assert c.get("/api/admin/overview").status_code == 403
         assert c.get("/api/map").status_code == 403

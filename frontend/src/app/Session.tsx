@@ -251,6 +251,10 @@ function SessionScreen() {
     hush();
     apply(await handover.finish());
   });
+  const reopen = () => run("reopen", async () => {
+    hush();
+    apply(await handover.reopen());
+  });
 
   const canAdd = !!has(s, "add") || !!has(s, "connect");
   const upload = (files: File[]) => {
@@ -522,7 +526,13 @@ function SessionScreen() {
                 )}
                 {stage === "done" && summaryMsg?.payload ? <SummaryCard s={summaryMsg.payload as SummaryPayload} /> : null}
                 {stage === "done" && readingMsg && <PrivacyButton onClick={() => setPrivacy(true)} className="mt-5" />}
-                {stage === "done" && <p className="mt-5 text-[13px] text-ink-muted">You can close this page. Thank you.</p>}
+                {stage === "done" && has(s, "reopen") && (
+                  <button type="button" onClick={reopen} disabled={!!busy}
+                    className="mt-5 inline-flex items-center gap-2 rounded-full bg-brand-700 px-5 py-2.5 text-[14px] font-medium text-white shadow-card transition-colors hover:bg-brand-800 disabled:opacity-60">
+                    <Plus className="h-4 w-4" /> {has(s, "reopen")!.label ?? "Add something I forgot"}
+                  </button>
+                )}
+                {stage === "done" && <p className="mt-4 text-[13px] text-ink-muted">You can close this page. Thank you.</p>}
               </div>
             </div>
           </div>

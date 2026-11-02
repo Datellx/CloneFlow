@@ -197,7 +197,10 @@ def draw(frame: np.ndarray, objs: list[Obj], concepts: list[str]) -> np.ndarray:
         x1, y1, x2, y2 = o.box
         try:
             m = o.mask()
-        except Exception:
+        except Exception as exc:  # label still drawn; say why the mask is missing (once)
+            if not getattr(draw, "_warned", False):
+                log.warning("SAM mask decode failed: %s", exc)
+                draw._warned = True
             continue
         h, w = m.shape
         h, w = min(h, H - y1), min(w, W - x1)

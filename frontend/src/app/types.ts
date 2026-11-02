@@ -54,6 +54,7 @@ export type Action =
   | { type: "skip" }
   | { type: "skip_connect"; label?: string }
   | { type: "finish"; label?: string }
+  | { type: "reopen"; label?: string }
   | { type: "start" };
 
 export interface Session {

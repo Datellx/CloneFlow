@@ -130,6 +130,15 @@ def session_finish(ctx: Ctx = Depends(current)):
     return _new_since(ctx, before)
 
 
+@router.post("/me/session/reopen")
+def session_reopen(ctx: Ctx = Depends(current)):
+    writable()
+    _own(ctx)
+    before = _since(ctx)
+    S.reopen(ctx.user)
+    return _new_since(ctx, before)
+
+
 @router.post("/me/session/upload")
 async def session_upload(files: list[UploadFile] = File(...), note: str = Form(""), ctx: Ctx = Depends(current)):
     writable()
