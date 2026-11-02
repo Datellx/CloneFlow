@@ -38,7 +38,10 @@ def _fast():
                 cache = os.environ.get("FASTEMBED_CACHE_PATH") or None
                 if cache and _has_onnx(cache):
                     os.environ.setdefault("HF_HUB_OFFLINE", "1")  # bundled model: never hit the network
-                _model = TextEmbedding("BAAI/bge-small-en-v1.5", cache_dir=cache)
+                # One thread: small cloud instances get a fraction of a CPU, and ONNX's default (one thread per host
+                # core) makes a single short query take ~0.5 s there instead of ~20 ms.
+                threads = int(os.environ.get("EMBED_THREADS", "1"))
+                _model = TextEmbedding("BAAI/bge-small-en-v1.5", cache_dir=cache, threads=threads)
             except Exception as exc:
                 log.info("fastembed unavailable (%s); using hashed embeddings", exc)
                 _model = None
@@ -89,9 +92,26 @@ def _hash_embed(text: str) -> np.ndarray:
     return v / n if n else v
 
 
+_QCACHE: dict[str, np.ndarray] = {}
+_QLOCK = threading.Lock()
+
+
 def embed(texts: list[str]) -> np.ndarray:
     if not texts:
         return np.zeros((0, DIM), dtype=np.float32)
+    if len(texts) == 1:  # questions: computed once, reused by every path that asks at the same time
+        with _QLOCK:
+            hit = _QCACHE.get(texts[0])
+            if hit is None:
+                hit = _embed(texts)[0]
+                if len(_QCACHE) > 2000:
+                    _QCACHE.clear()
+                _QCACHE[texts[0]] = hit
+        return hit[None, :]
+    return _embed(texts)
+
+
+def _embed(texts: list[str]) -> np.ndarray:
     m = _fast()
     if m is not None:
         arr = np.array(list(m.embed(texts)), dtype=np.float32)
