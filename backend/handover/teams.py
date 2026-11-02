@@ -24,7 +24,7 @@ from backend.db.models import Base, Org
 from backend.db.store import SessionLocal
 
 _POOL = cf.ThreadPoolExecutor(max_workers=4)
-REPLY_BUDGET_S = 3.6  # Teams gives an outgoing webhook 5 s in total
+REPLY_BUDGET_S = 2.4  # Teams gives an outgoing webhook 5 s end to end, network included
 LAST: dict[int, dict] = {}
 LAST_HOW: dict[int, str] = {}  # org id → the last message's outcome (shown on the admin's Teams page)
 
@@ -116,7 +116,7 @@ def answer(org_id: int, question: str) -> dict:
     if res is None:
         how = "quick answer (the written one was still coming)"
         try:
-            res = quick.result(timeout=max(0.2, 4.4 - (time.monotonic() - t0)))
+            res = quick.result(timeout=max(0.2, 3.2 - (time.monotonic() - t0)))
         except cf.TimeoutError:
             LAST_HOW[org_id] = "too slow: nothing was ready in time"
             return {"type": "message", "text": "Still looking through what your colleagues left behind. Ask me again in a moment."}
