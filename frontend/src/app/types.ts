@@ -87,7 +87,7 @@ export interface OrgProfile {
   vocabulary?: string[] | null;
   done?: boolean;
 }
-export interface PlanUsage extends Plan { used: number; left: number }
+export interface PlanUsage extends Plan { used: number; left: number; people?: string[] }
 
 export interface AdminOverview {
   org: { id: number; name: string; profile: OrgProfile };

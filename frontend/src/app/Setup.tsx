@@ -56,9 +56,12 @@ function SetupChat({ initial, first }: { initial: SetupState; first: string }) {
   }, [msgs]);
   // Everyone named in this conversation: new invitations, and people who were already invited (details updated).
   const invites = useMemo(() => {
-    const all = msgs.flatMap((m) => [...(m.payload?.invites ?? []), ...(m.payload?.updated ?? []).map((name) => ({ name, email: "" }))]);
+    const all = [
+      ...msgs.flatMap((m) => [...(m.payload?.invites ?? []), ...(m.payload?.updated ?? []).map((name) => ({ name, email: "" }))]),
+      ...(plan.people ?? []).map((name) => ({ name, email: "" })),
+    ];
     return all.filter((p, i) => all.findIndex((q) => q.name.toLowerCase() === p.name.toLowerCase()) === i);
-  }, [msgs]);
+  }, [msgs, plan]);
 
   // Speak the newest assistant line (the greeting is two lines: say both).
   const spokenId = useRef<number | null>(null);

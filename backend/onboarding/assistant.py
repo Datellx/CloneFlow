@@ -117,7 +117,8 @@ def _plan(db, org: Org) -> dict:
 
     p = plan_of(org)
     used = PEOPLE.leaving_count(db, org.id)
-    return {**p, "used": used, "left": max(p["employees"] - used, 0)}
+    return {**p, "used": used, "left": max(p["employees"] - used, 0),
+            "people": [x["name"] for x in PEOPLE.people_in(db, org.id) if x.get("name")]}
 
 
 def _merge(old: dict, new: dict) -> dict:
