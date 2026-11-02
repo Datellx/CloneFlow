@@ -34,6 +34,12 @@ def setup_message(body: SetupMsgIn, ctx: Ctx = Depends(current)):
     return A.message(ctx.user, body.text)
 
 
+@router.post("/setup/restart")
+def setup_restart(ctx: Ctx = Depends(current)):
+    _admin(ctx)
+    return A.restart(ctx.user)
+
+
 class FinishIn(BaseModel):
     skipped: bool = False
 

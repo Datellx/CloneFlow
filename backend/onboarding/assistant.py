@@ -153,7 +153,7 @@ def message(user: User, text: str) -> dict:
                    f"Already invited (don't return them in people unless the admin changes their details): "
                    f"{json.dumps(people_now) if people_now else 'nobody yet'}\n\nConversation so far:\n{convo}")
     out = ai.call_json("setup", None, SYSTEM, user_prompt, SCHEMA, "SetupTurn", org_id=org_id)
-    invites, problems = [], []
+    invites, problems, updated = [], [], []
     with SessionLocal() as db:
         org = db.get(Org, org_id)
         admin = db.get(User, user.id)
@@ -164,6 +164,7 @@ def message(user: User, text: str) -> dict:
         db.commit()
         for p in (out.get("people") or [])[:10]:
             if PEOPLE.update_existing(db, org, p):  # already invited: details updated, no second invitation
+                updated.append(str(p.get("name") or p.get("email")).strip())
                 continue
             try:
                 r = PEOPLE.invite(db, org, admin, p)
@@ -179,6 +180,11 @@ def message(user: User, text: str) -> dict:
                              + ("I emailed it; the link below works too." if sent else
                                 "Send the link however you like; it opens their private handover conversation."),
                  payload={"invites": invites})
+        if updated:
+            names = ", ".join(updated)
+            _say(db, org_id, f"{names} {'is' if len(updated) == 1 else 'are'} already invited, so I updated "
+                             f"{'their' if len(updated) > 1 else 'the'} details instead of sending a second invitation.",
+                 payload={"updated": updated})
         for prob in problems:
             _say(db, org_id, prob, payload={"problem": True})
         _say(db, org_id, reply, payload={"done": bool(merged.get("done"))})
@@ -186,6 +192,17 @@ def message(user: User, text: str) -> dict:
         new = db.scalars(select(SetupMsg).where(SetupMsg.org_id == org_id, SetupMsg.id > before).order_by(SetupMsg.id)).all()
         return {"messages": [_msg(m) for m in new], "done": bool(merged.get("done")),
                 "profile": {k: merged.get(k) for k in PROFILE_KEYS}, "plan": _plan(db, org)}
+
+
+def restart(user: User) -> dict:
+    """Start the setup conversation over: clears the transcript and the profile it built. People and handovers stay."""
+    with SessionLocal() as db:
+        org = db.get(Org, user.org_id)
+        for m in db.scalars(select(SetupMsg).where(SetupMsg.org_id == org.id)).all():
+            db.delete(m)
+        org.profile = {}
+        db.commit()
+    return state(user)
 
 
 def finish(user: User, skipped: bool = False) -> dict:
