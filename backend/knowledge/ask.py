@@ -32,23 +32,46 @@ def threshold() -> float:
     return 0.74 if backend_name().startswith(("fastembed", "bge")) else 0.22
 
 
-def retrieve(db, eid: int, question: str, k: int = 6) -> list[tuple[float, Card]]:
-    cards = db.scalars(select(Card).where(Card.clone_id == eid, Card.status != "contradicted")).all()
+class _Lite:
+    """What retrieval needs from a card, kept in memory (no ORM object, no JSON parsing per question)."""
+    __slots__ = ("id", "clone_id", "type", "title", "body", "steps", "status", "sources", "words")
+
+    def __init__(self, c: Card) -> None:
+        self.id, self.clone_id, self.type, self.title, self.body = c.id, c.clone_id, c.type, c.title, c.body
+        self.steps, self.status, self.sources = list(c.steps or []), c.status, list(c.sources or [])
+        self.words = _words(f"{c.title} {c.body} {' '.join(self.steps)}")
+
+
+_INDEX: dict[int, tuple[int, list, np.ndarray]] = {}  # clone id → (cards version, cards, embedding matrix)
+
+
+def _index(db, eid: int) -> tuple[list, np.ndarray]:
+    ver = _version(db, eid)
+    got = _INDEX.get(eid)
+    if got and got[0] == ver:
+        return got[1], got[2]
+    rows = db.scalars(select(Card).where(Card.clone_id == eid, Card.status != "contradicted")).all()
+    rows = [c for c in rows if c.embedding]
+    cards = [_Lite(c) for c in rows]
+    mat = np.asarray([c.embedding for c in rows], dtype=np.float32) if rows else np.zeros((0, 1), dtype=np.float32)
+    _INDEX[eid] = (ver, cards, mat)
+    return cards, mat
+
+
+def retrieve(db, eid: int, question: str, k: int = 6) -> list[tuple[float, "_Lite"]]:
+    cards, mat = _index(db, eid)
     if not cards:
         return []
     qv = embed([question])[0]
     qw = _words(question)
+    cos = mat @ qv if mat.shape[1] == qv.shape[0] else np.zeros(len(cards), dtype=np.float32)
     scored = []
-    for c in cards:
-        if not c.embedding:
-            continue
-        cos = float(np.dot(qv, np.asarray(c.embedding, dtype=np.float32)))
-        cw = _words(f"{c.title} {c.body} {' '.join(c.steps or [])}")
-        overlap = len(qw & cw) / max(1, len(qw))
+    for c, cs in zip(cards, cos):
+        overlap = len(qw & c.words) / max(1, len(qw))
         bonus = 0.08 if c.status == "verified_in_interview" else 0.0
         if not c.sources:  # placeholder / unproven cards never outrank real knowledge
             bonus -= 0.25
-        scored.append((cos + 0.15 * overlap + bonus, c))
+        scored.append((float(cs) + 0.15 * overlap + bonus, c))
     scored.sort(key=lambda x: -x[0])
     return scored[:k]
 
