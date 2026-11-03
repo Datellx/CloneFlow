@@ -8,7 +8,6 @@ import { homeFor } from "./lib/home";
 import Landing from "./site/Landing";
 import { AuthCallback, Join, Login, ResetPassword, Signup } from "./site/Auth";
 import DownloadPage, { PrivacyPage, TermsPage } from "./site/Download";
-import ContactPage from "./site/Contact";
 import NotFound from "./site/NotFound";
 import Walk from "./shared/routes/Walk";
 import SessionPage from "./app/Session";
@@ -66,7 +65,6 @@ export default function App() {
       <Route path="/auth/reset" element={<ResetPassword />} />
       <Route path="/download" element={<DownloadPage />} />
       <Route path="/privacy" element={<PrivacyPage />} />
-      <Route path="/contact" element={<ContactPage />} />
       <Route path="/terms" element={<TermsPage />} />
       <Route path="/walk/:token" element={<Walk />} />
       <Route path="/setup" element={<Setup />} />

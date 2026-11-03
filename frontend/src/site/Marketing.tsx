@@ -10,7 +10,6 @@ const NAV: { label: string; to: string }[] = [
   { label: "How it works", to: "/#how" },
   { label: "For IT & security", to: "/#security" },
   { label: "Pricing", to: "/#pricing" },
-  { label: "Contact", to: "/contact" },
 ];
 
 /** Scroll to the hash after navigation (react-router doesn't). */
@@ -94,10 +93,13 @@ function MarketingFooter() {
           <p className="mt-3 max-w-[30ch] text-[13.5px] leading-relaxed text-ink-muted">
             Keeps what people know when they leave. Made by Datellx LLC in Madison, Wisconsin.
           </p>
+          <p className="mt-3 text-[13.5px] text-ink-muted">
+            Contact: <a className="font-medium text-brand-700 hover:underline" href="mailto:hello@datellx.com">hello@datellx.com</a>
+          </p>
         </div>
         <FooterCol title="Product" links={[["How it works", "/#how"], ["Pricing", "/#pricing"], ["Desktop apps", "/download"]]} />
         <FooterCol title="Trust" links={[["For IT & security", "/#security"], ["Privacy", "/privacy"], ["Terms", "/terms"]]} />
-        <FooterCol title="Company" links={[["Contact us", "/contact"], ["Create your organization", "/signup"], ["Sign in to your organization", "/login"]]} />
+        <FooterCol title="Account" links={[["Create your organization", "/signup"], ["Sign in to your organization", "/login"]]} />
       </div>
       <div className="border-t border-line">
         <div className="mx-auto flex max-w-[1200px] flex-col gap-1 px-4 py-5 text-[12.5px] text-ink-faint sm:flex-row sm:justify-between sm:px-8">

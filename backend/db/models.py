@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from datetime import date, datetime, timezone
 
-from sqlalchemy import JSON, Boolean, Date, DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import JSON, Boolean, Date, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -74,16 +74,3 @@ class Clone(Base):
     settings: Mapped[dict] = mapped_column(JSON, default=dict)  # thresholds, keep budget, etc.
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
     owner: Mapped[User | None] = relationship()
-
-
-class ContactMessage(Base):
-    """A message from the website's contact form (kept even when email delivery isn't configured)."""
-    __tablename__ = "contact_messages"
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String(200))
-    email: Mapped[str] = mapped_column(String(320))
-    company: Mapped[str] = mapped_column(String(200), default="")
-    topic: Mapped[str] = mapped_column(String(40), default="")
-    message: Mapped[str] = mapped_column(Text)
-    emailed: Mapped[bool] = mapped_column(Boolean, default=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
