@@ -398,7 +398,7 @@ function SessionScreen() {
   const summaryMsg = useMemo(() => (s ? [...s.messages].reverse().find((m) => m.kind === "summary") : undefined), [s]);
   const connectAction = has(s, "connect");
   // Files go through "Show me → Upload" and folders/PDM through "Share screen", so a Files tile is never shown.
-  const providers = connectAction?.providers.filter((p) => p.key !== "files") ?? null;
+  const providers = connectAction?.providers.filter((p) => p.key !== "files" && (p.configured || p.connected)) ?? null;
 
   if (sq.error) {
     if (sq.error instanceof ApiError && sq.error.status === 401) return <Navigate to={signInPath("/session")} replace />;

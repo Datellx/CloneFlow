@@ -1,5 +1,7 @@
 # Architecture
 
+![How Meta's models work together](img/architecture.jpg)
+
 ```
  Browser / desktop app ──► Render: FastAPI engine (serves the website + /api) ──► Meta Model API (Muse)
                                                         │
@@ -30,18 +32,32 @@
    returning knowledge cards with source quotes. Cards are de-duplicated with local embeddings. One large call plans
    the interview: at most 10 gap questions (missing why, contradiction, unfinished task, undocumented step, who to
    contact), each with evidence.
-5. **Interview** (`knowledge/interview.py`, `handover/session.py`). Answers by voice or text update or create cards
-   (`verified_in_interview`). Uploads go through the same extraction; videos, screen recordings and the phone walk
-   (`knowledge/walk.py`, `media/frames.py`) keep frames only on scene change, blur faces locally, and send one vision
-   call per clip.
+5. **Interview** (`knowledge/interview.py`, `handover/session.py`). Answers by voice (`muse-voice-transcribe-1.0`) or
+   text update or create cards (`verified_in_interview`). Someone who connects nothing is asked three questions about
+   the role they described, then can show instead. Uploads go through the same extraction. Screen recordings and the
+   phone walk (`knowledge/walk.py`, `media/frames.py`) keep frames only on scene change, blur faces locally, and send
+   one `muse-spark-1.3` vision call per clip.
+   **Uploaded videos of physical work** (`media/sam.py`, run in the background with live progress): Muse Voice
+   Transcribe hears the narration; Muse Spark vision looks at three face-blurred frames and names what to track
+   ("white robot arm", "hand"); **SAM 3.1** segments and tracks those objects in every frame (one upload, one call per
+   concept); keyframes are picked where the object moves and the frame is in focus; the masks are drawn on them and on
+   a tracked clip; Muse Spark vision turns the marked-up keyframes plus the narration into steps, each linked to its
+   moment in the clip.
 6. **Ask** (`knowledge/ask.py`). Local retrieval over every pack in the organization; below the similarity threshold
    the answer is "I don't know" plus who might know (free); otherwise one small call writes the answer from the
    retrieved cards only, with proof. Answers are cached until the knowledge changes. Teams gets an answer within its
    5-second limit (an extractive answer if the model is still composing).
 
+## Voice
+
+The interviewer and the setup assistant speak with an ElevenLabs voice (`media/tts.py`, `ELEVENLABS_API_KEY`);
+lines are cached on disk, a failed line is retried once, and only that line falls back to the browser's voice.
+Without a key, the browser's voice is used throughout.
+
 ## Cost control
 
-- `ORG_AI_CAP_USD` (default 2): every model call checks the organization's spend in `cost_log` first.
+- `ORG_AI_CAP_USD` (default 2): every model call checks the organization's spend in `cost_log` first; an
+  organization can have its own allowance (`profile.ai_cap_usd`). SAM 3.1 frames are logged too.
 - `MAX_SPEND_USD`: optional hard stop per process (scripts, local runs).
 - Every call is logged with step, person, organization, tokens and cost (`cost_log`).
 - Offline model (`LLM_PROVIDER=mock`): deterministic stand-ins for every step, used by the test suite.

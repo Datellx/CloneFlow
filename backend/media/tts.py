@@ -30,21 +30,31 @@ def synthesize(text: str) -> tuple[bytes | None, str | None]:
     cached = _cache_path(key)
     if cached.exists():
         return cached.read_bytes(), "audio/mpeg"
-    if p == "openai":
-        r = httpx.post("https://api.openai.com/v1/audio/speech",
-                       headers={"Authorization": f"Bearer {settings.tts_api_key}"},
-                       json={"model": "gpt-4o-mini-tts", "voice": voice, "input": text, "response_format": "mp3"},
-                       timeout=60)
-    else:
-        r = httpx.post(f"https://api.elevenlabs.io/v1/text-to-speech/{voice}",
-                       headers={"xi-api-key": settings.tts_api_key, "accept": "audio/mpeg"},
-                       params={"output_format": "mp3_44100_128"},
-                       json={"text": text, "model_id": ELEVEN_MODEL,
-                             "voice_settings": {"stability": 0.5, "similarity_boost": 0.75, "style": 0.15}},
-                       timeout=60)
+    for attempt in range(2):  # one retry: a single hiccup should not drop the conversation to the browser voice
+        try:
+            if p == "openai":
+                r = httpx.post("https://api.openai.com/v1/audio/speech",
+                               headers={"Authorization": f"Bearer {settings.tts_api_key}"},
+                               json={"model": "gpt-4o-mini-tts", "voice": voice, "input": text, "response_format": "mp3"},
+                               timeout=30)
+            else:
+                r = httpx.post(f"https://api.elevenlabs.io/v1/text-to-speech/{voice}",
+                               headers={"xi-api-key": settings.tts_api_key, "accept": "audio/mpeg"},
+                               params={"output_format": "mp3_44100_128"},
+                               json={"text": text, "model_id": ELEVEN_MODEL,
+                                     "voice_settings": {"stability": 0.5, "similarity_boost": 0.75, "style": 0.15}},
+                               timeout=30)
+        except httpx.HTTPError as exc:
+            log.warning("voice service unreachable: %s", exc)
+            if attempt:
+                return None, "temporary"
+            continue
+        if r.status_code in (429, 500, 502, 503, 504) and not attempt:
+            continue
+        break
     if r.status_code >= 300:
         log.warning("voice service answered %s: %s", r.status_code, r.text[:200])
-        return None, None
+        return None, "temporary"
     try:
         cached.write_bytes(r.content)
     except OSError:

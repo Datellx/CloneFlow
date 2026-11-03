@@ -280,6 +280,8 @@ def speak(body: SpeakIn, ctx: Ctx = Depends(current)):
     from backend.media.tts import synthesize
 
     audio, mime = synthesize(body.text[:4000])
+    if audio is None and mime == "temporary":  # configured, but this line failed: the page uses the browser voice once
+        raise HTTPException(503, "The voice service didn't answer for this line.")
     if audio is None:
         raise HTTPException(501, "Server voice is not configured; the browser voice is used.")
     return Response(content=audio, media_type=mime)
