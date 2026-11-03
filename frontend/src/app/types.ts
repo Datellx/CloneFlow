@@ -73,6 +73,7 @@ export interface Session {
   sources: SourceCard[];
   cards_recent: Card[];
   ai_enabled: boolean;
+  working?: { detail: string; since: string } | null;
 }
 
 export interface SessionReply { messages: Msg[]; session: Session }

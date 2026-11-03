@@ -11,11 +11,12 @@ from __future__ import annotations
 import logging
 import mimetypes
 import os
+import threading
 import time
 import re
 import shutil
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 from sqlalchemy import JSON, DateTime, ForeignKey, String, Text, func, select
@@ -193,7 +194,7 @@ def session_dict(db, user: User, c: Clone | None) -> dict:
             "question": q, "coverage": core.coverage(db, c.id),
             "coverage_before": iv.coverage_before if iv else None, "progress": progress, "run": run,
             "sources": core.source_cards(db, c.id), "cards_recent": [core.card_dict(x) for x in recent],
-            "ai_enabled": ai.ai_ready()}
+            "ai_enabled": ai.ai_ready(), "working": st.get("working")}
 
 
 # ---------------------------------------------------------------- background progress → messages
@@ -514,6 +515,36 @@ def upload(user: User, files: list[tuple[str, bytes]], note: str = "") -> None:
         p = work / Path(name).name
         p.write_bytes(data)
         (media if p.suffix.lower() in VIDEO | IMAGE else docs).append(p)
+    if settings.llm_provider != "mock" and any(p.suffix.lower() in VIDEO for p in media):
+        # a video takes minutes (voice, SAM 3.1 tracking, vision): do it in the background, show progress
+        _working(eid, "Watching your video")
+        threading.Thread(target=_upload_work, args=(eid, qid, qtext, work, docs, media, note), daemon=True).start()
+        return
+    _upload_rest(eid, qid, qtext, work, docs, media, note)
+
+
+def _working(eid: int, detail: str | None) -> None:
+    """What Clone Flow is busy with in the background (shown under the avatar while the page polls)."""
+    with SessionLocal() as db:
+        c = db.get(Clone, eid)
+        _set_state(c, working={"detail": detail, "since": datetime.now(timezone.utc).isoformat()} if detail else None)
+        db.commit()
+
+
+def _upload_work(eid: int, qid, qtext: str, work: Path, docs: list[Path], media: list[Path], note: str) -> None:
+    try:
+        _upload_rest(eid, qid, qtext, work, docs, media, note)
+    except Exception as exc:
+        log.exception("upload processing failed")
+        with SessionLocal() as db:
+            say(db, eid, "Sorry, I couldn't finish watching that. Please try again in a moment."
+                if not isinstance(exc, ai.TrialLimit) else str(exc))
+            db.commit()
+    finally:
+        _working(eid, None)
+
+
+def _upload_rest(eid: int, qid, qtext: str, work: Path, docs: list[Path], media: list[Path], note: str) -> None:
     new_ids: list[int] = []
     learned_lines = []
     if docs:
@@ -558,6 +589,7 @@ def upload(user: User, files: list[tuple[str, bytes]], note: str = "") -> None:
         say(db, eid, (" and ".join(learned_lines) or "Saved") + (f" — {len(cards)} new piece{'s' if len(cards) != 1 else ''} of knowledge." if cards else "."))
         if qid and new_ids:
             _next(db, c)
+        _set_state(c, working=None)
         db.commit()
     shutil.rmtree(work, ignore_errors=True)
 
@@ -612,17 +644,21 @@ def _video_cards(eid: int, video: Path, narration: str, qtext: str) -> list[int]
     out_dir = IV.media_dir(eid, f"uploads/{uuid.uuid4().hex[:8]}")
     clip = out_dir / video.name
     shutil.copy2(video, clip)
+    _working(eid, "Listening to what you said · Muse Voice Transcribe")
     said = narration or _spoken(eid, clip)
     frames, tracked, sam_info = [], None, None
     if settings.llm_provider != "mock" and os.environ.get("SAM_ENABLED", "1") != "0":
         try:
             from backend.media import sam as SAM
 
+            _working(eid, "Choosing what to track · Muse Spark vision")
             concepts = _sam_concepts(eid, said, qtext, clip)
+            _working(eid, "Tracking " + ", ".join(concepts[:2]) + " frame by frame · SAM 3.1")
             tr = SAM.track(clip, out_dir, concepts)
             SAM.bill(eid, tr)
             if any(tr.found().values()):
                 _t = time.monotonic()
+                _working(eid, "Marking the keyframes · SAM 3.1")
                 frames, tracked = SAM.render(tr, out_dir, SAM.keyframes(tr))
                 log.info("sam: keyframes + tracked clip drawn in %.1fs", time.monotonic() - _t)
                 sam_info = SAM.summary(tr)
@@ -645,6 +681,7 @@ def _video_cards(eid: int, video: Path, narration: str, qtext: str) -> list[int]
                  + "; the keyframes are where it moves)")
     prompt = P.FRAMES_PROMPT.format(who=who, what=what, n=len(frames), last=len(frames) - 1,
                                     said=ai.redact(said or "(no narration)"), question=qtext)
+    _working(eid, "Writing the steps from the keyframes · Muse Spark vision")
     out = ai.call_vision("frames", eid, prompt, [f.read_bytes() for f in frames], P.FRAMES_SCHEMA, "V2Frames")
     labels = out.get("labels") or []
     shown = tracked or clip

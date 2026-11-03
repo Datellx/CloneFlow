@@ -408,7 +408,7 @@ function SessionScreen() {
 
   const stage = s.stage;
   const orbState: OrbState =
-    mode === "talk" || mode === "screen" ? "listening" : mode === "sending" || busy === "upload" || busy === "screen" ? "thinking" : stage === "reading" && ai.orb !== "speaking" ? "thinking" : ai.orb;
+    mode === "talk" || mode === "screen" ? "listening" : mode === "sending" || busy === "upload" || busy === "screen" || s.working ? "thinking" : stage === "reading" && ai.orb !== "speaking" ? "thinking" : ai.orb;
   // The avatar is always the main thing, but it makes room when the stage has something to show.
   const busyStage = stage === "connect" || stage === "done" || stage === "reading";
   const orbSize = wide ? (busyStage ? (short ? 120 : 148) : short ? 168 : 216) : busyStage ? 104 : 136;
@@ -479,6 +479,11 @@ function SessionScreen() {
                 {stage === "interview" && q?.gap_type && <GapBadge type={q.gap_type} />}
                 {showProgress && <span className="tnum text-[12.5px] text-ink-muted">{Math.min(s.progress.asked + 1, s.progress.total)} of {s.progress.total}</span>}
                 {stage === "reading" && <span className="text-[12.5px] font-medium text-brand-700">Reading your work</span>}
+                {s.working && (
+                  <span className="inline-flex items-center gap-2 rounded-full bg-white px-3.5 py-1.5 text-[13px] font-medium text-brand-700 shadow-card ring-1 ring-line">
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" /> {s.working.detail}
+                  </span>
+                )}
               </div>
 
               <div aria-live="polite" className="w-full">

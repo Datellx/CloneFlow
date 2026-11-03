@@ -72,6 +72,7 @@ export const useSession = () =>
       const d = q.state.data;
       if (!d) return false;
       if (d.stage === "reading") return 1000;
+      if (d.working) return 2000; // watching a video in the background
       const c = d.actions.find((a) => a.type === "connect") as { providers?: T.Provider[] } | undefined;
       return c?.providers?.some((p) => p.status === "importing") ? 1000 : false;
     },
