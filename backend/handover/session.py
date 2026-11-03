@@ -11,6 +11,7 @@ from __future__ import annotations
 import logging
 import mimetypes
 import os
+import time
 import re
 import shutil
 import uuid
@@ -621,7 +622,9 @@ def _video_cards(eid: int, video: Path, narration: str, qtext: str) -> list[int]
             tr = SAM.track(clip, out_dir, concepts)
             SAM.bill(eid, tr)
             if any(tr.found().values()):
+                _t = time.monotonic()
                 frames, tracked = SAM.render(tr, out_dir, SAM.keyframes(tr))
+                log.info("sam: keyframes + tracked clip drawn in %.1fs", time.monotonic() - _t)
                 sam_info = SAM.summary(tr)
         except ai.TrialLimit:
             raise

@@ -484,6 +484,15 @@ async def teams_webhook(slug: str, request: Request):
     return JSONResponse(reply)
 
 
+@router.get("/admin/diag/log")
+def admin_diag_log(ctx: Ctx = Depends(current)):
+    """Admin-only: recent app log lines (timings of long steps such as video processing)."""
+    from .main import RECENT_LOG
+
+    _admin(ctx)
+    return {"lines": list(RECENT_LOG.lines)}
+
+
 @router.get("/admin/diag/ask")
 def admin_diag_ask(q: str = "who do we call at the supplier", ctx: Ctx = Depends(current)):
     """Admin-only timing of the free answer path (search model, database), to keep Teams inside its 5 s."""

@@ -21,6 +21,28 @@ from .routes_setup import router as setup_router
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 log = logging.getLogger("cloneflow")
 
+
+class _Recent(logging.Handler):
+    """The last few hundred app log lines, for the admin diagnostics page (no secrets are logged)."""
+    lines: "collections.deque[str]"
+
+    def __init__(self) -> None:
+        super().__init__(logging.INFO)
+        import collections
+
+        self.lines = collections.deque(maxlen=300)
+        self.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s"))
+
+    def emit(self, record: logging.LogRecord) -> None:
+        try:
+            self.lines.append(self.format(record)[:600])
+        except Exception:
+            pass
+
+
+RECENT_LOG = _Recent()
+log.addHandler(RECENT_LOG)
+
 app = FastAPI(title="Clone Flow", version="1.0.0", docs_url="/api/docs", openapi_url="/api/openapi.json")
 _ORIGINS = ["http://localhost:5173", "http://127.0.0.1:5173"] + [
     o.strip().rstrip("/") for o in os.environ.get("WEB_ORIGINS", "").split(",") if o.strip()]

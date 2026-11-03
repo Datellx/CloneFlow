@@ -151,12 +151,15 @@ def track(video: Path, out_dir: Path, concepts: list[str]) -> Tracks:
     """Run SAM 3.1 once per concept on one uploaded clip; merge the tracks by frame."""
     t0 = time.monotonic()
     clip, n, size = prepare(video, out_dir)
+    log.info("sam: prepared %d frames %s in %.1fs", n, size, time.monotonic() - t0)
     fid = _upload(clip)
+    log.info("sam: uploaded at %.1fs", time.monotonic() - t0)
     by: dict[int, list[Obj]] = {}
     billed = 0
     for c in concepts[:3]:
         text, frames = _segment(fid, c)
         billed += max(frames, 50)
+        log.info("sam: '%s' segmented (%d chars) at %.1fs", c, len(text), time.monotonic() - t0)
         for f, objs in parse(text, c).items():
             by.setdefault(f, []).extend(objs)
         del text
