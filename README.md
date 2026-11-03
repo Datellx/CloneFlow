@@ -8,6 +8,13 @@ they go, and hands it to the next person right where they work, in Microsoft Tea
 
 ▶ **3-minute demo video:** _link added at submission_ · **Live app:** https://cloneflow-engine.onrender.com
 
+**Judges — try it live, no account needed.** On the [home page](https://cloneflow-engine.onrender.com):
+- **Start the tour** — the Northwind Robotics workspace, view-only: Maya Lee's finished handover (knowledge map,
+  every card with its proof, the SAM 3.1 calibration video, the successor briefing). Ask a question in **Ask**, the same
+  engine that answers `@Clone Flow` in Teams.
+- **Try it yourself** — a private workspace where *you* are the one leaving: tell it about your job, and it asks what
+  only you know. Talk or type, share your screen, or upload a short video of a hands-on task.
+
 | SAM 3.1 tracks a robot-arm calibration a person filmed | A successor asks `@Clone Flow` in Teams and gets the answer, with proof |
 |---|---|
 | ![SAM 3.1 tracking](docs/img/sam-tracking.jpg) | ![Answer in Teams](docs/img/teams-answer.jpg) |
