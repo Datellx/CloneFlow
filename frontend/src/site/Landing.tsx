@@ -380,7 +380,7 @@ function Pricing() {
           ))}
         </div>
         <p className="mt-6 text-center text-[13px] text-ink-muted">
-          Need more, single sign-on or your own cloud? <a className="font-medium text-brand-700 hover:underline" href="mailto:hello@datellx.com?subject=Clone%20Flow">Talk to us</a>.
+          Need more, single sign-on or your own cloud? <Link className="font-medium text-brand-700 hover:underline" to="/contact?topic=pricing">Talk to us</Link>.
         </p>
       </div>
     </section>
@@ -389,10 +389,10 @@ function Pricing() {
 
 function ContactCta({ plan }: { plan: string }) {
   return (
-    <a href={`mailto:hello@datellx.com?subject=${encodeURIComponent(`Clone Flow ${plan}`)}`}
+    <Link to="/contact?topic=pricing" aria-label={`Contact us about the ${plan} plan`}
       className="inline-flex h-12 w-full items-center justify-center rounded-full bg-white text-[15.5px] font-medium text-ink ring-1 ring-inset ring-line-strong transition-colors hover:ring-ink-faint">
       Contact us
-    </a>
+    </Link>
   );
 }
 

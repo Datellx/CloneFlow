@@ -10,6 +10,7 @@ const NAV: { label: string; to: string }[] = [
   { label: "How it works", to: "/#how" },
   { label: "For IT & security", to: "/#security" },
   { label: "Pricing", to: "/#pricing" },
+  { label: "Contact", to: "/contact" },
 ];
 
 /** Scroll to the hash after navigation (react-router doesn't). */
@@ -96,7 +97,7 @@ function MarketingFooter() {
         </div>
         <FooterCol title="Product" links={[["How it works", "/#how"], ["Pricing", "/#pricing"], ["Desktop apps", "/download"]]} />
         <FooterCol title="Trust" links={[["For IT & security", "/#security"], ["Privacy", "/privacy"], ["Terms", "/terms"]]} />
-        <FooterCol title="Account" links={[["Create your organization", "/signup"], ["Sign in to your organization", "/login"]]} />
+        <FooterCol title="Company" links={[["Contact us", "/contact"], ["Create your organization", "/signup"], ["Sign in to your organization", "/login"]]} />
       </div>
       <div className="border-t border-line">
         <div className="mx-auto flex max-w-[1200px] flex-col gap-1 px-4 py-5 text-[12.5px] text-ink-faint sm:flex-row sm:justify-between sm:px-8">
