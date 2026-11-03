@@ -1,19 +1,44 @@
 # Clone Flow
 
+**When people leave, their knowledge stays.**
+
+When someone leaves a company, what they know leaves with them: why a line is calibrated a certain way, who to call
+when parts fail, where the right drawings are. Clone Flow captures that know-how in one guided conversation before
+they go, and hands it to the next person right where they work, in Microsoft Teams.
+
+▶ **3-minute demo video:** _link added at submission_ · **Live app:** https://cloneflow-engine.onrender.com
+
+| SAM 3.1 tracks a robot-arm calibration a person filmed | A successor asks `@Clone Flow` in Teams and gets the answer, with proof |
+|---|---|
+| ![SAM 3.1 tracking](docs/img/sam-tracking.jpg) | ![Answer in Teams](docs/img/teams-answer.jpg) |
+
 ## Meta Global AI Hackathon 2026 — Submission Overview
 
 - **Track & problem statement**: Startup (Datellx LLC) · Build for Your World
 - **Hackathon provenance (Oct 26 – Nov 4, 2026)**: built 100% from scratch during the hackathon window. No code existed before Oct 26.
 - **Meta AI runtime models** (all through the Meta Model API, `api.meta.ai`):
-  - `muse-spark-1.3` — low reasoning effort reads email, meetings and chats into knowledge cards and answers in Teams; high effort finds the gaps, plans the interview and writes the briefing; vision reads screen shares, photos and video keyframes
-  - `muse-voice-transcribe-1.0` — hears what the person says while they show something
-  - `sam-3.1` — segments and tracks the physical task in uploaded videos (e.g. calibrating a robot arm); Muse Spark picks what to track from the person's own words
-- **Bonus categories targeted**: Best Agentic Use-Case (multi-step: read → find gaps → interview → answer with proof)
-- **3-minute demo video**: _link added at submission_
-- **Live app**: https://cloneflow-engine.onrender.com
-- **Quickstart**: `cp .env.example .env.local`, set `MODEL_API_KEY` (your Meta Model API key), then `./run.sh` → http://localhost:8000 (tests: `pytest -q`)
+  - `muse-spark-1.3` — low reasoning effort reads email, meetings and chats into knowledge cards and answers in Teams; high effort finds the gaps, plans the interview and writes the briefing; vision reads screen shares, photos and video keyframes, and picks what SAM should track
+  - `muse-voice-transcribe-1.0` — hears what the person says while they talk or show something
+  - `sam-3.1` — segments and tracks the physical task in uploaded videos (shown on a real SO-101 robot-arm calibration)
+- **Bonus category targeted**: Best Agentic Use-Case (multi-step: read → find gaps → interview → answer with proof)
+- **Benchmarks**: see [Benchmarks](#benchmarks-live-product-nov-23-2026) below
 
-**When people leave, their knowledge stays.**
+![How Meta's models work together](docs/img/architecture.jpg)
+
+## Quickstart
+
+```bash
+git clone https://github.com/Datellx/CloneFlow && cd CloneFlow
+cp .env.example .env.local      # set MODEL_API_KEY to your Meta Model API key
+./run.sh                        # installs, builds the web app, serves http://localhost:8000
+.venv/bin/python -m pytest -q   # 11 tests, offline
+```
+
+**No key?** Leave `MODEL_API_KEY` empty: Clone Flow starts with an offline stand-in for the models (no network,
+no cost), so the whole flow — setup, invitation, interview, knowledge pack, Ask — can be clicked through locally.
+Answers are then simple heuristics, not Muse. The test suite runs the same way.
+
+## What it is
 
 Clone Flow is a web application for companies. When an employee gives notice, the company admin invites them to
 one private conversation with Clone Flow. Clone Flow reads their work email, chats, files and repositories (personal
@@ -69,7 +94,7 @@ Spending is deliberate: noise, newsletters, duplicates, recurring reminders and 
 before anything reaches the model; retrieval and "I don't know" decisions use local embeddings
 (`bge-small-en-v1.5`, on the server); repeated questions are cached.
 
-## Benchmarks (live product, Nov 2, 2026)
+## Benchmarks (live product, Nov 2–3, 2026)
 
 Measured on a full handover (Maya, a robotics engineer, five years of Gmail, Outlook mail and meetings, and Teams):
 
@@ -140,3 +165,7 @@ e2e/            Playwright browser walk-through
 ```
 
 © 2026 Datellx LLC. All rights reserved.
+
+## License
+
+Apache License 2.0 — see [LICENSE](LICENSE). © 2026 Datellx LLC.
