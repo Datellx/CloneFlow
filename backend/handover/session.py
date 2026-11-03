@@ -570,19 +570,36 @@ SAM_CONCEPTS = {"type": "object", "properties": {"objects": {"type": "array", "i
                 "required": ["objects"]}
 
 
-def _sam_concepts(eid: int, said: str, qtext: str) -> list[str]:
-    """1–3 short noun phrases for the physical things being worked on (SAM 3.1 prompts), from what was said."""
+def _sam_concepts(eid: int, said: str, qtext: str, clip: Path | None = None) -> list[str]:
+    """1–3 short noun phrases for SAM 3.1: Muse Spark vision looks at a few frames (faces blurred) and listens to what
+    was said, and names the things being worked on as they look, so look-alikes in the room are not tracked."""
+    sysmsg = ("You pick what to track in a work video with a segmentation model that takes short noun phrases. Return 1-3 "
+              "phrases (2-4 words, singular, concrete physical objects or parts) for the things the person is handling, "
+              "most important first: the whole machine first, then the part that moves; add 'hand' if their hands do "
+              "the work. Describe each as it looks (colour or material) so similar things in the room — lamps, stands, "
+              "cables, a second machine — are not picked, e.g. 'white robot arm'.")
+    user = f"They said: {ai.redact(said or '(nothing)')}\nQuestion: {qtext or '(none)'}"
+    objs: list[str] = []
     try:
-        out = ai.call_json("sam_concepts", eid, "You pick what to track in a work video. Return 1-3 short noun phrases "
-                           "(2-3 words, singular, concrete physical objects or parts) for the things the person is "
-                           "handling, most important first. Prefer the whole machine first, then the part that moves.",
-                           f"They said: {ai.redact(said or '(nothing)')}\nQuestion: {qtext or '(none)'}",
-                           SAM_CONCEPTS, "SamConcepts")
-        objs = [o.strip().lower()[:40] for o in (out.get("objects") or []) if o and o.strip()]
+        if clip is not None:
+            from backend.media import frames as vf
+            tmp = clip.parent / "concept_frames"
+            pics = vf.keyframes(clip, tmp, max_frames=3, max_side=768)
+            for f in pics:
+                for box in vf.local_faces(f):
+                    vf.blur_boxes(f, [box])
+            if pics:
+                out = ai.call_vision("sam_concepts", eid, sysmsg + "\n\n" + user, [f.read_bytes() for f in pics],
+                                     SAM_CONCEPTS, "SamConcepts")
+                objs = [o.strip().lower()[:40] for o in (out.get("objects") or []) if o and o.strip()]
+            shutil.rmtree(tmp, ignore_errors=True)
+        if not objs:
+            out = ai.call_json("sam_concepts", eid, sysmsg, user, SAM_CONCEPTS, "SamConcepts")
+            objs = [o.strip().lower()[:40] for o in (out.get("objects") or []) if o and o.strip()]
     except ai.TrialLimit:
         raise
-    except Exception:
-        objs = []
+    except Exception as exc:
+        log.warning("SAM concept choice failed: %s", exc)
     return objs[:3] or ["robot arm", "hand"]
 
 
@@ -600,7 +617,7 @@ def _video_cards(eid: int, video: Path, narration: str, qtext: str) -> list[int]
         try:
             from backend.media import sam as SAM
 
-            concepts = _sam_concepts(eid, said, qtext)
+            concepts = _sam_concepts(eid, said, qtext, clip)
             tr = SAM.track(clip, out_dir, concepts)
             SAM.bill(eid, tr)
             if any(tr.found().values()):

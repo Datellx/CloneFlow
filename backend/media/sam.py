@@ -30,7 +30,7 @@ log = logging.getLogger("cloneflow.sam")
 
 MODEL = os.environ.get("SAM_MODEL", "sam-3.1")
 FPS = float(os.environ.get("SAM_FPS", "8"))
-MAX_SECONDS = float(os.environ.get("SAM_MAX_SECONDS", "75"))
+MAX_SECONDS = float(os.environ.get("SAM_MAX_SECONDS", "120"))
 WIDTH = int(os.environ.get("SAM_WIDTH", "640"))
 # The API bills video per frame (minimum 50 per request); the per-frame price is configurable for the allowance.
 USD_PER_FRAME = float(os.environ.get("SAM_USD_PER_FRAME", "0.0002"))
@@ -160,6 +160,24 @@ def track(video: Path, out_dir: Path, concepts: list[str]) -> Tracks:
     return tr
 
 
+def _sharpness(clip: Path, want: set[int]) -> dict[int, float]:
+    """Focus measure (variance of the Laplacian) for the frames we may pick."""
+    out: dict[int, float] = {}
+    cap = cv2.VideoCapture(str(clip))
+    i = 0
+    while want and i <= max(want):
+        ok, fr = cap.read()
+        if not ok:
+            break
+        if i in want:
+            h, w = fr.shape[:2]
+            g = cv2.cvtColor(cv2.resize(fr, (320, max(1, int(320 * h / w)))), cv2.COLOR_BGR2GRAY)
+            out[i] = float(cv2.Laplacian(g, cv2.CV_64F).var())
+        i += 1
+    cap.release()
+    return out
+
+
 def keyframes(tr: Tracks, k: int = 6) -> list[int]:
     """Frames where the tracked object actually moves: spread k picks over the cumulative motion of the first concept
     that was found (box centre + size change), keeping them at least 1 s apart; always the first and last sighting."""
@@ -174,11 +192,19 @@ def keyframes(tr: Tracks, k: int = 6) -> list[int]:
         return np.array([(x1 + x2) / 2, (y1 + y2) / 2, x2 - x1, y2 - y1], dtype=float)
     g = [geom(f) for f in seen]
     motion = np.concatenate([[0.0], np.cumsum([np.abs(g[i] - g[i - 1]).sum() for i in range(1, len(g))])])
-    picks = [seen[0]]
+    sharp = _sharpness(tr.clip, set(seen))
+    W, H = tr.size
+    def score(f):  # in focus, and the object big enough to see
+        return (sharp.get(f, 1.0) ** 0.5) * min(1.0, 0.25 + g[seen.index(f)][2] * g[seen.index(f)][3] / max(W * H, 1) * 4)
+    win = max(1, int(tr.fps))
+    def best_near(i):  # handheld video blurs while moving: take the sharpest sighting within ~1 s
+        lo, hi = max(0, i - win), min(len(seen), i + win + 1)
+        return max(seen[lo:hi], key=score)
+    idx = [0]
     if motion[-1] > 0:
-        for q in np.linspace(0, motion[-1], num=k)[1:-1]:
-            picks.append(seen[int(np.searchsorted(motion, q))])
-    picks.append(seen[-1])
+        idx += [int(np.searchsorted(motion, q)) for q in np.linspace(0, motion[-1], num=k)[1:-1]]
+    idx.append(len(seen) - 1)
+    picks = [best_near(min(i, len(seen) - 1)) for i in idx]
     gap = max(1, int(tr.fps))
     out: list[int] = []
     for f in sorted(set(picks)):
