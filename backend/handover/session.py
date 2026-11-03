@@ -523,11 +523,17 @@ def upload(user: User, files: list[tuple[str, bytes]], note: str = "") -> None:
     _upload_rest(eid, qid, qtext, work, docs, media, note)
 
 
-def _working(eid: int, detail: str | None) -> None:
-    """What Clone Flow is busy with in the background (shown under the avatar while the page polls)."""
+def _working(eid: int, detail: str | None, diag: str | None = None) -> None:
+    """What Clone Flow is busy with in the background (shown under the avatar while the page polls). `diag` (last
+    step, timing, memory) is kept with it, so a step that never finished can be found afterwards."""
     with SessionLocal() as db:
         c = db.get(Clone, eid)
-        _set_state(c, working={"detail": detail, "since": datetime.now(timezone.utc).isoformat()} if detail else None)
+        cur = _state(c).get("working") or {}
+        if detail is None and diag is None:
+            _set_state(c, working=None)
+        else:
+            _set_state(c, working={"detail": detail or cur.get("detail"), "diag": diag or cur.get("diag"),
+                                   "since": cur.get("since") or datetime.now(timezone.utc).isoformat()})
         db.commit()
 
 
@@ -654,7 +660,7 @@ def _video_cards(eid: int, video: Path, narration: str, qtext: str) -> list[int]
             _working(eid, "Choosing what to track · Muse Spark vision")
             concepts = _sam_concepts(eid, said, qtext, clip)
             _working(eid, "Tracking " + ", ".join(concepts[:2]) + " frame by frame · SAM 3.1")
-            tr = SAM.track(clip, out_dir, concepts)
+            tr = SAM.track(clip, out_dir, concepts, note=lambda m: _working(eid, None, m))
             SAM.bill(eid, tr)
             if any(tr.found().values()):
                 _t = time.monotonic()

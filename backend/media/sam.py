@@ -96,7 +96,8 @@ def prepare(video: Path, out_dir: Path) -> tuple[Path, int, tuple[int, int]]:
     640 px (phone videos are often portrait; this keeps the masks, and the server's memory, small)."""
     clip = out_dir / "sam_input.mp4"
     r = run([FFMPEG, "-y", "-i", str(video), "-t", str(MAX_SECONDS), "-vf", f"fps={FPS},scale={WIDTH}:{WIDTH}:force_original_aspect_ratio=decrease,scale=trunc(iw/2)*2:trunc(ih/2)*2",
-             "-an", "-c:v", "libx264", "-preset", "veryfast", "-crf", "23", "-pix_fmt", "yuv420p", str(clip)])
+             "-an", "-c:v", "libx264", "-preset", "veryfast", "-crf", "23", "-pix_fmt", "yuv420p", "-threads", "2",
+             str(clip)])
     if r.returncode != 0:
         raise RuntimeError("could not prepare the video for SAM: " + r.stderr[-300:])
     cap = cv2.VideoCapture(str(clip))
@@ -147,19 +148,36 @@ def parse(text: str, concept: str) -> dict[int, list[Obj]]:
     return out
 
 
-def track(video: Path, out_dir: Path, concepts: list[str]) -> Tracks:
+def rss_mb() -> int:
+    """This process's resident memory (Linux; 0 elsewhere)."""
+    try:
+        for line in open("/proc/self/status"):
+            if line.startswith("VmRSS:"):
+                return int(line.split()[1]) // 1024
+    except OSError:
+        pass
+    return 0
+
+
+def track(video: Path, out_dir: Path, concepts: list[str], note=None) -> Tracks:
     """Run SAM 3.1 once per concept on one uploaded clip; merge the tracks by frame."""
     t0 = time.monotonic()
+    def step(msg: str) -> None:
+        line = f"{msg} at {time.monotonic() - t0:.1f}s, {rss_mb()} MB"
+        log.info("sam: %s", line)
+        if note:
+            note(line)
+    step("preparing")
     clip, n, size = prepare(video, out_dir)
-    log.info("sam: prepared %d frames %s in %.1fs", n, size, time.monotonic() - t0)
+    step(f"prepared {n} frames {size[0]}x{size[1]}")
     fid = _upload(clip)
-    log.info("sam: uploaded at %.1fs", time.monotonic() - t0)
+    step("uploaded")
     by: dict[int, list[Obj]] = {}
     billed = 0
     for c in concepts[:3]:
         text, frames = _segment(fid, c)
         billed += max(frames, 50)
-        log.info("sam: '%s' segmented (%d chars) at %.1fs", c, len(text), time.monotonic() - t0)
+        step(f"'{c}' segmented ({len(text)} chars)")
         for f, objs in parse(text, c).items():
             by.setdefault(f, []).extend(objs)
         del text
@@ -265,7 +283,7 @@ def render(tr: Tracks, out_dir: Path, picks: list[int]) -> tuple[list[Path], Pat
     w, h = tr.size
     clip_out = out_dir / "sam_tracked.mp4"
     ff = subprocess.Popen([FFMPEG, "-y", "-v", "error", "-f", "rawvideo", "-pix_fmt", "bgr24", "-s", f"{w}x{h}",
-                           "-r", str(tr.fps), "-i", "-", "-c:v", "libx264", "-preset", "veryfast", "-crf", "23",
+                           "-r", str(tr.fps), "-i", "-", "-c:v", "libx264", "-preset", "veryfast", "-crf", "23", "-threads", "2",
                            "-pix_fmt", "yuv420p", "-movflags", "+faststart", str(clip_out)], stdin=subprocess.PIPE)
     keys: dict[int, Path] = {}
     i = 0

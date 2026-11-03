@@ -490,7 +490,9 @@ def admin_diag_log(ctx: Ctx = Depends(current)):
     from .main import RECENT_LOG
 
     _admin(ctx)
-    return {"lines": list(RECENT_LOG.lines)}
+    from backend.media.sam import rss_mb
+
+    return {"rss_mb": rss_mb(), "lines": list(RECENT_LOG.lines)}
 
 
 @router.get("/admin/diag/ask")
