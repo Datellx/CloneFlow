@@ -51,17 +51,21 @@ class Obj:
     _hw: tuple[int, int] = (0, 0)
     _mask: np.ndarray | None = field(default=None, repr=False)
 
-    def mask(self) -> np.ndarray:
-        """Boolean raster covering the box (decoded lazily: most frames are never drawn)."""
-        if self._mask is None:
-            from meta_sam_parser import decode_mask_to_raster
-            from meta_sam_parser._types import SegmentationMask
+    def mask(self, keep: bool = False) -> np.ndarray:
+        """Boolean raster covering the box, decoded on demand. Not kept by default: a long video has thousands of
+        masks, and keeping them all would not fit in a small server's memory."""
+        if self._mask is not None:
+            return self._mask
+        from meta_sam_parser import decode_mask_to_raster
+        from meta_sam_parser._types import SegmentationMask
 
-            h, w = self._hw
-            raw = decode_mask_to_raster(SegmentationMask("one_bit" if self._enc == "!" else "lossless",
-                                                         self._enc + self._payload, w, h))
-            self._mask = np.frombuffer(raw, dtype=np.uint8).reshape(h, w).astype(bool)
-        return self._mask
+        h, w = self._hw
+        raw = decode_mask_to_raster(SegmentationMask("one_bit" if self._enc == "!" else "lossless",
+                                                     self._enc + self._payload, w, h))
+        m = np.frombuffer(raw, dtype=np.uint8).reshape(h, w).astype(bool)
+        if keep:
+            self._mask = m
+        return m
 
 
 @dataclass
@@ -88,9 +92,10 @@ def _key() -> str:
 
 
 def prepare(video: Path, out_dir: Path) -> tuple[Path, int, tuple[int, int]]:
-    """A small H.264 MP4 the API accepts (it takes MP4/MOV with H.264/H.265, not WebM): ≤75 s, 8 fps, 640 px wide."""
+    """A small H.264 MP4 the API accepts (it takes MP4/MOV with H.264/H.265, not WebM): ≤120 s, 8 fps, longest side
+    640 px (phone videos are often portrait; this keeps the masks, and the server's memory, small)."""
     clip = out_dir / "sam_input.mp4"
-    r = run([FFMPEG, "-y", "-i", str(video), "-t", str(MAX_SECONDS), "-vf", f"fps={FPS},scale={WIDTH}:-2",
+    r = run([FFMPEG, "-y", "-i", str(video), "-t", str(MAX_SECONDS), "-vf", f"fps={FPS},scale={WIDTH}:{WIDTH}:force_original_aspect_ratio=decrease,scale=trunc(iw/2)*2:trunc(ih/2)*2",
              "-an", "-c:v", "libx264", "-preset", "veryfast", "-crf", "23", "-pix_fmt", "yuv420p", str(clip)])
     if r.returncode != 0:
         raise RuntimeError("could not prepare the video for SAM: " + r.stderr[-300:])
@@ -154,6 +159,7 @@ def track(video: Path, out_dir: Path, concepts: list[str]) -> Tracks:
         billed += max(frames, 50)
         for f, objs in parse(text, c).items():
             by.setdefault(f, []).extend(objs)
+        del text
     tr = Tracks(clip=clip, fps=FPS, frames=n, size=size, by_frame=by, concepts=concepts[:3],
                 seconds=round(time.monotonic() - t0, 1), frames_billed=billed)
     log.info("sam: %d frames, %s found, %.1fs", n, tr.found(), tr.seconds)
