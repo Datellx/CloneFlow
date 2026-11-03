@@ -364,7 +364,7 @@ function EvidenceExcerpt({ proof, onOpen, tall }: { proof: Proof; onOpen?: (p: P
           {proof.frame_url && <img src={mediaUrl(proof.frame_url)} alt="" className="h-full w-full object-cover" />}
           <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-black/60 px-2.5 py-1 text-xs font-medium text-white backdrop-blur">
             {proof.kind === "screen" ? <Play className="h-3 w-3 fill-current" /> : <Smartphone className="h-3 w-3" />}
-            {proof.kind === "screen" ? "Screen recording" : "Floor walk"}
+            {proof.kind === "screen" ? "Screen recording" : /^Video\b/.test(proof.label) ? "Uploaded video" : "Floor walk"}
             {proof.timestamp_s != null && <span className="tnum">· {fmtClock(proof.timestamp_s)}</span>}
           </span>
         </div>
@@ -430,7 +430,7 @@ export function ProofModal({ eid, proof, onClose }: { eid: number; proof: Proof 
       open={!!p}
       onClose={onClose}
       title={p ? proofLabel(p) : ""}
-      subtitle={p ? { email: "Email", chat: "Chat", file: "File", screen: "Screen recording", floor: "Floor walk", interview: "Exit interview" }[p.kind] : ""}
+      subtitle={p ? (p.kind === "floor" && /^Video\b/.test(p.label) ? "Uploaded video" : { email: "Email", chat: "Chat", file: "File", screen: "Screen recording", floor: "Floor walk", interview: "Exit interview" }[p.kind]) : ""}
     >
       {p?.kind === "email" && <MailReader id={p.ref} />}
       {p?.kind === "file" && <FilePreview id={p.ref} highlight={p.quote?.split(" · ")[0]} />}
