@@ -120,7 +120,7 @@ function Rich({
         <div className="mt-2 space-y-1.5">
           {cards.map((c) => {
             // what was seen (screen, video, phone): one tap opens the frame and the clip at that moment
-            const seen = (c.sources || []).filter((x) => x.frame_url && (x.kind === "screen" || x.kind === "floor")).slice(0, 2);
+            const seen = (c.sources || []).filter((x) => x.frame_url && (x.kind === "screen" || x.kind === "floor")).slice(0, 6);
             return (
               <div key={c.id} className="space-y-1">
                 <CardPill card={c} />
