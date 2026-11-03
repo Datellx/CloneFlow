@@ -119,7 +119,7 @@ Measured on a full handover (Maya, a robotics engineer, five years of Gmail, Out
 
 ## Run it locally
 
-Requirements: Python 3.11+, Node 20+, ffmpeg.
+Requirements: Python 3.11+ and Node 20+ (ffmpeg is bundled through `imageio-ffmpeg`; a system ffmpeg is used when present).
 
 ```bash
 cp .env.example .env.local        # add MODEL_API_KEY (Meta Model API); without it an offline model is used
