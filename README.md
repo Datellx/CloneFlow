@@ -78,7 +78,8 @@ Measured on a full handover (Maya, a robotics engineer, five years of Gmail, Out
 | Messages read in one pass | 394 emails and meetings + 232 Teams messages |
 | Personal emails kept away from the model (code filter) | 9 of 9; 0 work emails wrongly removed |
 | Teams answer latency, 10 live questions | median 4.0 s, p90 5.0 s; "I don't know" in 0.6 s with no model call |
-| Meta API cost of the whole handover (per-call log) | $0.93; about $0.004 per answer |
+| SAM 3.1 on a 92 s phone video of an SO-101 calibration | 742 frames tracked in 87 s on the live server (arm + hand, picked by Muse Spark vision from the narration) |
+| Muse API cost of the whole handover (per-call log) | $0.93; about $0.004 per answer |
 | Automated tests | 11 / 11 pass (`pytest -q`) |
 
 

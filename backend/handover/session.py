@@ -194,7 +194,7 @@ def session_dict(db, user: User, c: Clone | None) -> dict:
             "question": q, "coverage": core.coverage(db, c.id),
             "coverage_before": iv.coverage_before if iv else None, "progress": progress, "run": run,
             "sources": core.source_cards(db, c.id), "cards_recent": [core.card_dict(x) for x in recent],
-            "ai_enabled": ai.ai_ready(), "working": st.get("working")}
+            "ai_enabled": ai.ai_ready(), "working": _live_working(st.get("working"))}
 
 
 # ---------------------------------------------------------------- background progress → messages
@@ -521,6 +521,16 @@ def upload(user: User, files: list[tuple[str, bytes]], note: str = "") -> None:
         threading.Thread(target=_upload_work, args=(eid, qid, qtext, work, docs, media, note), daemon=True).start()
         return
     _upload_rest(eid, qid, qtext, work, docs, media, note)
+
+
+def _live_working(w: dict | None) -> dict | None:
+    """Background work older than 30 minutes was cut short (e.g. a restart): don't show it as still running."""
+    try:
+        if w and (datetime.now(timezone.utc) - datetime.fromisoformat(w["since"])).total_seconds() < 1800:
+            return w
+    except (KeyError, ValueError, TypeError):
+        pass
+    return None
 
 
 def _working(eid: int, detail: str | None, diag: str | None = None) -> None:
