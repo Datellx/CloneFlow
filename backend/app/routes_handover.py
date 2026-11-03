@@ -1,6 +1,8 @@
 """Handover API (docs/API.md): the departing employee's conversation, source connections, the admin console, Teams."""
 from __future__ import annotations
 
+import anyio
+
 import uuid
 from datetime import date
 from pathlib import Path
@@ -74,7 +76,7 @@ async def session_message(request: Request, ctx: Ctx = Depends(current)):
             data = await audio.read()
             wav, secs = va.bytes_to_wav(data, settings.data_dir / "uploads" / "answers",
                                         Path(getattr(audio, "filename", "") or "a.webm").suffix or ".webm")
-            text = ai.transcribe(_own(ctx).id, wav, secs)
+            text = await anyio.to_thread.run_sync(ai.transcribe, _own(ctx).id, wav, secs)
             mode = "voice"
         mode = mode or "voice"
     if not text.strip():
@@ -83,7 +85,7 @@ async def session_message(request: Request, ctx: Ctx = Depends(current)):
     if stage in ("intro", "interview", "open", "done") and not (stage == "intro" and len(S._state(_own(ctx)).get("intro_answers", [])) == 0):
         require_ai()
     try:
-        ids = S.message(ctx.user, text[:4000], mode)
+        ids = await anyio.to_thread.run_sync(S.message, ctx.user, text[:4000], mode)
     except S.ai.TrialLimit:
         raise
     except S.ai.LLMError as exc:
@@ -151,7 +153,7 @@ async def session_upload(files: list[UploadFile] = File(...), note: str = Form("
         payload.append((Path(f.filename or "upload").name, data))
     before = _since(ctx)
     try:
-        S.upload(ctx.user, payload, note)
+        await anyio.to_thread.run_sync(S.upload, ctx.user, payload, note)  # minutes for a video: keep the server responsive
     except S.ai.TrialLimit:
         raise
     except S.ai.LLMError as exc:
@@ -168,7 +170,7 @@ async def session_screen(video: UploadFile = File(...), narration: str = Form(""
     path = d / f"{uuid.uuid4().hex}{Path(video.filename or 'v.webm').suffix or '.webm'}"
     path.write_bytes(await video.read())
     before = _since(ctx)
-    S.screen(ctx.user, path, narration)
+    await anyio.to_thread.run_sync(S.screen, ctx.user, path, narration)
     return _new_since(ctx, before)
 
 

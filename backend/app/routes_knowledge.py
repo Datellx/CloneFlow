@@ -1,6 +1,8 @@
 """Knowledge API (docs/API.md): people and their knowledge packs, source viewers, the phone floor walk, Ask, the map."""
 from __future__ import annotations
 
+import anyio
+
 import os
 from pathlib import Path
 
@@ -288,7 +290,8 @@ async def walk_frame(token: str, frame: UploadFile = File(...), t: float = Form(
 async def walk_audio(token: str, audio: UploadFile = File(...)):
     require_ai()
     try:
-        return WALK.add_audio(token, await audio.read(), Path(audio.filename or "a.webm").suffix or ".webm")
+        data = await audio.read()
+        return await anyio.to_thread.run_sync(WALK.add_audio, token, data, Path(audio.filename or "a.webm").suffix or ".webm")
     except LookupError as exc:
         raise HTTPException(404, str(exc)) from exc
 
