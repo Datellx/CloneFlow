@@ -6,7 +6,7 @@ When someone leaves a company, what they know leaves with them: why a line is ca
 when parts fail, where the right drawings are. Clone Flow captures that know-how in one guided conversation before
 they go, and hands it to the next person right where they work, in Microsoft Teams.
 
-▶ **3-minute demo video:** _link added at submission_ · **Live app:** https://cloneflow-engine.onrender.com
+▶ **3-minute demo video:** https://vimeo.com/1243028020 · **Live app:** https://cloneflow-engine.onrender.com
 
 | SAM 3.1 tracks a robot-arm calibration a person filmed | A successor asks `@Clone Flow` in Teams and gets the answer, with proof |
 |---|---|
