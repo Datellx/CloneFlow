@@ -12,7 +12,6 @@ import { Orb } from "../shared/Orb";
 import { HeroVideo, DemoReel } from "./HeroReel";
 import { useTitle } from "../app/orgs";
 import { Eyebrow, MarketingFrame } from "./Marketing";
-import { JudgeDoors } from "./JudgeDoors";
 
 const rise = { initial: { opacity: 0, y: 14 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true, margin: "-60px" }, transition: { duration: 0.5, ease: [0.2, 0.8, 0.2, 1] } } as const;
 
@@ -103,7 +102,6 @@ function Hero() {
           <SignInCta />
         </motion.div>
         <ComingSoon />
-        <JudgeDoors className="mt-7" />
         <motion.ul initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }}
           className="mt-6 flex flex-wrap justify-center gap-x-5 gap-y-2 text-[13px] text-ink-muted">
           {["Personal stays private", "Proof on every answer", "Set up in five minutes"].map((t) => (

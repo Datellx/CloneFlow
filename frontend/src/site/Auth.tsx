@@ -13,7 +13,6 @@ import { isCloudApp, isDesktopShell } from "@/lib/desktop";
 import { useAfterAuth } from "@/lib/home";
 import { Orb } from "../shared/Orb";
 import { useTitle } from "../app/orgs";
-import { JudgeDoors } from "./JudgeDoors";
 
 /* ------------------------------------------------------------------ bits */
 function Input({ id, label, hint, ...rest }: React.InputHTMLAttributes<HTMLInputElement> & { id: string; label: string; hint?: ReactNode }) {
@@ -261,7 +260,6 @@ export function Login() {
         <div className="space-y-2">
           <div>Admin setting up Clone Flow? <Link to="/signup" className="font-medium text-brand-700 hover:underline">Create your organization</Link></div>
           <div className="text-[13px]">Leaving your company? Use the invitation link your admin sent you.</div>
-          <JudgeDoors compact className="!mt-6" />
         </div>
       )}
     >

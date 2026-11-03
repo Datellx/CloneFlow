@@ -17,7 +17,6 @@ from .routes_account import router as account_router
 from .routes_handover import router as handover_router
 from .routes_knowledge import router as knowledge_router
 from .routes_setup import router as setup_router
-from .routes_demo import router as demo_router
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 log = logging.getLogger("cloneflow")
@@ -84,7 +83,6 @@ app.include_router(account_router)
 app.include_router(knowledge_router)
 app.include_router(handover_router)
 app.include_router(setup_router)
-app.include_router(demo_router)
 
 
 @app.exception_handler(TrialLimit)
