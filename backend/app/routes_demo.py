@@ -83,7 +83,7 @@ def try_it(body: TryIn, request: Request, response: Response, db=Depends(get_db)
     _enabled()
     _limit(request, "try", 15)
     name = (body.name or "").strip()[:60] or "Guest"
-    org = Org(name="Your company (demo)", slug=_slug(db, f"demo-{secrets.token_hex(3)}"), is_demo=True,
+    org = Org(name="Demo Company", slug=_slug(db, f"demo-{secrets.token_hex(3)}"), is_demo=True,
               profile={"done": True, "ai_cap_usd": TRY_CAP_USD,
                        "summary": "A demo workspace. The person being interviewed is trying Clone Flow on their own job, "
                                   "whatever it is (office, lab or factory floor)."})

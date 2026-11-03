@@ -49,4 +49,4 @@ def test_judge_tour_is_view_only_and_try_it_yourself_interviews():
         r = c.post("/api/me/session/finish").json()
         assert r["session"]["stage"] == "done"
         # it is a separate organization: nothing from the tour workspace is visible
-        assert c.get("/api/admin/overview").json()["org"]["name"] == "Your company (demo)"
+        assert c.get("/api/admin/overview").json()["org"]["name"] == "Demo Company"

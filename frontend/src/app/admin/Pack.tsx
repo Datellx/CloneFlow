@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, CalendarClock, ChevronDown, MessagesSquare, RotateCcw, TriangleAlert } from "lucide-react";
-import { ApiError } from "@/lib/api";
+import { ApiError, useMe } from "@/lib/api";
 import { cn } from "@/lib/format";
 import { Button, Dialog, EmptyState, ErrorState, Skeleton } from "@/components/ui";
 import { useQueryClient } from "@tanstack/react-query";
@@ -22,6 +22,7 @@ const PLURAL: Record<CardType, string> = {
 export default function Pack() {
   const eid = Number(useParams().eid);
   const emp = useEmployee(eid);
+  const me = useMe();
   const cards = useCards(eid);
   const [tab, setTab] = useState<"pack" | "briefing">("pack");
   const [proof, setProof] = useState<Proof | null>(null);
@@ -45,7 +46,7 @@ export default function Pack() {
         <Link to="/admin/knowledge" className="inline-flex items-center gap-1.5 text-[13px] font-medium text-ink-muted hover:text-ink">
           <ArrowLeft className="h-4 w-4" /> Knowledge base
         </Link>
-        {e && <StartOver eid={eid} name={e.name} />}
+        {e && !me.data?.judge && <StartOver eid={eid} name={e.name} />}
       </div>
       {!e ? (
         <Skeleton className="h-32 rounded-2xl" />

@@ -265,7 +265,7 @@ def _after_reading(db, c: Clone, r: Run) -> None:
 
 
 def _ask(db, c: Clone, q: QuestionV2) -> None:
-    lead = GAP_INTRO.get(q.gap_type or "", "")
+    lead = GAP_INTRO.get(q.gap_type or "", "") if q.evidence else ""  # the lead-ins describe what was read
     say(db, c.id, f"{lead} {q.text}".strip(), kind="evidence" if q.evidence else "text",
         payload={"question_id": q.id, "gap_type": q.gap_type, "sources": q.evidence or [], "project": q.project})
 

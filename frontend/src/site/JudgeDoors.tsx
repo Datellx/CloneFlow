@@ -30,7 +30,7 @@ export function JudgeDoors({ className, compact }: { className?: string; compact
   return (
     <section aria-labelledby="judges" className={cn("w-full max-w-[880px] rounded-[22px] border border-line bg-white p-5 text-left shadow-card sm:p-6", className)}>
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 id="judges" className="text-[13px] font-semibold uppercase tracking-[0.14em] text-brand-700">
+        <h2 id="judges" className="font-sans text-[12.5px] font-semibold uppercase tracking-[0.14em] text-brand-700">
           Meta AI Hackathon judges · try it now, no account
         </h2>
         {!compact && <span className="text-[12.5px] text-ink-muted">Live product, live Meta models</span>}
