@@ -93,9 +93,12 @@ export default function Overview() {
                       <div className="truncate text-[14px] font-medium text-ink">{i.name || i.email}</div>
                       <div className="truncate text-[12.5px] text-ink-muted">{i.email} · sent {fmtDay(i.created_at)}</div>
                     </div>
-                    <ResendButton id={i.id} mailto={mailtoFor({ name: i.name || "", email: i.email, link: i.link, org: d?.org.name ?? "", from: me?.user.name ?? "" })} />
-
-                    <CopyLink link={i.link} />
+                    {i.link && (
+                      <>
+                        <ResendButton id={i.id} mailto={mailtoFor({ name: i.name || "", email: i.email, link: i.link, org: d?.org.name ?? "", from: me?.user.name ?? "" })} />
+                        <CopyLink link={i.link} />
+                      </>
+                    )}
                   </li>
                 ))}
               </ul>

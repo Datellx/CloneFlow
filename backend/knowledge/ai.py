@@ -82,8 +82,22 @@ def org_spend(org_id: int | None) -> float:
             or_(CostLog.org_id == org_id, CostLog.clone_id.in_(clones)))) or 0.0)
 
 
+def cap_for(org_id: int | None) -> float:
+    """The organization's AI allowance: its own (profile["ai_cap_usd"], set by Datellx) or the default."""
+    if org_id:
+        from backend.db.models import Org
+        from backend.db.store import SessionLocal
+
+        with SessionLocal() as db:
+            o = db.get(Org, org_id)
+            v = (o.profile or {}).get("ai_cap_usd") if o else None
+        if isinstance(v, (int, float)) and v >= 0:
+            return float(v)
+    return org_cap()
+
+
 def org_budget(org_id: int | None) -> dict:
-    cap = org_cap()
+    cap = cap_for(org_id)
     spent = org_spend(org_id)
     return {"cap_usd": cap, "spent_usd": round(spent, 4), "left_usd": round(max(cap - spent, 0.0), 4) if cap > 0 else None,
             "reached": cap > 0 and spent >= cap}
@@ -91,10 +105,11 @@ def org_budget(org_id: int | None) -> dict:
 
 def check_org(eid: int | None = None, org_id: int | None = None) -> None:
     """Raise TrialLimit before a model call when the organization's allowance is used up. Mock calls cost $0."""
-    if org_cap() <= 0:
-        return
     oid = org_id or org_of(eid)
-    if oid and org_spend(oid) >= org_cap():
+    cap = cap_for(oid)
+    if cap <= 0:
+        return
+    if oid and org_spend(oid) >= cap:
         raise TrialLimit(TRIAL_MESSAGE)
 
 

@@ -36,7 +36,7 @@ def test_uploads_only_session_and_org_allowance(monkeypatch):
         types = [a["type"] for a in s["actions"]]
         assert "skip_connect" in types and "start_reading" not in types
         s = c.post("/api/me/session/skip").json()["session"]
-        assert s["stage"] == "open"
+        assert s["stage"] == "interview" and s["progress"]["total"] == 3  # asked directly about the role
         assert {"screen", "upload", "phone"} <= set(next(a for a in s["actions"] if a["type"] == "add")["modes"])
         r = c.post("/api/me/session/upload", files={"files": ("freezer.md", b"# Freezer -80\n1. Check the alarm log every Monday\n2. Call Thermo rep Lisa\n")}).json()
         assert any(m["kind"] == "cards" for m in r["messages"])

@@ -79,11 +79,16 @@ def me_payload(db, user: User) -> dict:
     return {"user": user_dict(user), "org": {"id": org.id, "name": org.name, "slug": org.slug, "plan": plan_of(org),
                                              "set_up": bool((org.profile or {}).get("done")),
                                              "created_at": org.created_at.isoformat()},
-            "owned_clone_ids": owned, "is_admin": user.role == "admin", "home": _home(db, user, owned)}
+            "owned_clone_ids": owned, "is_admin": user.role in ("admin", "judge"), "judge": user.role == "judge",
+            "demo": bool(org.is_demo), "home": _home(db, user, owned)}
 
 
 def _home(db, user: User, owned: list[int]) -> str:
     """The person leaving lands in their conversation; a company admin lands in the console."""
+    if user.role == "judge":
+        return "/admin"
+    if user.role == "admin" and owned and db.get(Org, user.org_id).is_demo:  # "Try it yourself": straight to the interview
+        return "/session"
     if user.role == "admin":  # the organization is run from the console (setup conversation first)
         org = db.get(Org, user.org_id)
         return "/admin" if (org.profile or {}).get("done") else "/setup"

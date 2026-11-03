@@ -31,4 +31,6 @@ export interface Me {
   /** Where to land after sign-in. */
   home?: "/session" | "/admin" | "/ask" | "/setup";
   is_admin?: boolean;
+  judge?: boolean;
+  demo?: boolean;
 }

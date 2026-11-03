@@ -55,6 +55,7 @@ export default function AdminShell() {
           <Logo to="/admin" />
           <span className="w-9" />
         </header>
+        {m.judge && <JudgeBanner />}
         <main id="main" className={cn(fullBleed ? "h-[calc(100dvh-56px)] lg:h-[100dvh]" : "mx-auto w-full max-w-[1180px] px-4 pb-20 pt-8 sm:px-8 lg:px-10 lg:pt-10")}>
           <Outlet />
         </main>
@@ -127,6 +128,16 @@ function UserMenu() {
           </button>
         </div>
       )}
+    </div>
+  );
+}
+
+function JudgeBanner() {
+  return (
+    <div className="relative flex flex-wrap items-center justify-center gap-x-3 gap-y-1 border-b border-brand-100 bg-brand-50 px-4 py-2 text-center text-[13px] text-brand-800">
+      <span><b className="font-semibold">Judge tour · view-only.</b> Maya Lee's finished handover at Northwind Robotics. Open any card to see its proof, or ask a question in <Link to="/admin/ask" className="font-medium underline underline-offset-2">Ask</Link>.</span>
+      <a href="/" onClick={async (e) => { e.preventDefault(); await fetch("/api/auth/logout", { method: "POST", credentials: "include" }); window.location.assign("/#judges"); }}
+        className="font-medium underline underline-offset-2">Try it yourself instead</a>
     </div>
   );
 }

@@ -396,6 +396,14 @@ def _intro(eid: int, text: str) -> None:
         except ai.LLMError as exc:
             log.warning("profile step failed: %s", exc)
     with SessionLocal() as db:
+        demo = bool(db.get(Org, db.get(Clone, eid).org_id).is_demo)
+    if demo:  # demo workspace: no mailbox to connect, go straight to the questions
+        with SessionLocal() as db:
+            say(db, eid, reply)
+            db.commit()
+        return _ask_directly(eid, "In this demo I won't read your email, so I'll ask you directly. Answer by talking "
+                                  "or typing, or tap Show me to share your screen or upload a photo or video of the work.")
+    with SessionLocal() as db:
         c = db.get(Clone, eid)
         say(db, eid, reply)
         say(db, eid, "Now the part that saves you the most time: let me read your work email and chats, so I only "
@@ -448,13 +456,11 @@ def _answer_gap(eid: int, text: str, mode: str) -> None:
 def skip(user: User) -> None:
     with SessionLocal() as db:
         c = own_clone(db, user)
-        if _state(c).get("stage") == "connect":  # no email or chat to read: go straight to showing and telling
-            say(db, c.id, "No problem. Then show me instead: tell me what only you know, share your screen while you "
-                          "do a task, upload documents, photos or videos, or walk me around with your phone. "
-                          "Tap “I'm done” when you're finished.")
-            _ensure_interview(db, c.id)
-            _set_state(c, stage="open")
+        if _state(c).get("stage") == "connect":  # nothing to read: ask about the role they described, then show & tell
+            eid = c.id
             db.commit()
+            _ask_directly(eid, "No problem — then I'll ask you directly. Answer by talking or typing, or tap Show me "
+                               "to share your screen or upload a photo or video of the work.")
             return
         q = _current_q(db, c.id)
         if q:
@@ -462,6 +468,55 @@ def skip(user: User) -> None:
             say(db, c.id, "No problem — I'll mark that for someone else to ask.")
             _next(db, c)
         db.commit()
+
+
+STARTER_SCHEMA = {"type": "object", "properties": {"questions": {"type": "array", "items": {
+    "type": "object", "properties": {"gap_type": {"type": "string", "enum": [
+        "undocumented_step", "who_to_contact", "missing_why", "unfinished_task"]}, "text": {"type": "string"}},
+    "required": ["gap_type", "text"]}}}, "required": ["questions"]}
+STARTER_SYSTEM = """Someone is leaving their job and did not connect email or chat. From what they said about their
+role, write 3 short interview questions (one sentence each, plain words, second person) that draw out what only they
+know: one step-by-step task nobody wrote down (undocumented_step), who they call when something goes wrong and for what
+(who_to_contact), and why something is done their particular way (missing_why). Make each specific to their work."""
+STARTER_DEFAULT = [
+    ("undocumented_step", "Walk me through one task you do that isn't written down anywhere, step by step, the way "
+                          "you'd teach it to the next person."),
+    ("who_to_contact", "When something goes wrong in your work, who do you call, and for what?"),
+    ("missing_why", "Is there something you do a particular way that a newcomer might change? Why is it done your way?"),
+]
+
+
+def _ask_directly(eid: int, lead: str) -> None:
+    """No email or chat to read: three questions about the role they described, then show & tell."""
+    with SessionLocal() as db:
+        intro = list(_state(db.get(Clone, eid)).get("intro_answers", []))
+    qs = _starter_questions(eid, intro)
+    with SessionLocal() as db:
+        c = db.get(Clone, eid)
+        iv = _ensure_interview(db, eid)
+        for i, (gt, text) in enumerate(qs):
+            db.add(QuestionV2(interview_id=iv.id, index=i, kind="gap", gap_type=gt, text=text, evidence=[]))
+        say(db, eid, lead)
+        _set_state(c, stage="interview")
+        db.flush()
+        _next(db, c)
+        db.commit()
+
+
+def _starter_questions(eid: int, intro: list[str]) -> list[tuple[str, str]]:
+    if intro and ai.ai_ready() and settings.llm_provider != "mock":
+        try:
+            out = ai.call_json("gaps", eid, STARTER_SYSTEM, "Their words:\n" + "\n".join(f"- {a}" for a in intro),
+                               STARTER_SCHEMA, "StarterQuestions")
+            qs = [(q.get("gap_type") or "undocumented_step", q["text"].strip()) for q in out.get("questions", [])
+                  if (q.get("text") or "").strip()]
+            if qs:
+                return qs[:3]
+        except ai.TrialLimit:
+            raise
+        except Exception as exc:
+            log.warning("starter questions failed: %s", exc)
+    return STARTER_DEFAULT
 
 
 def _free_knowledge(eid: int, text: str, mode: str) -> None:

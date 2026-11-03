@@ -57,8 +57,12 @@ class Ctx:
     db: Session
 
     @property
-    def is_admin(self) -> bool:
-        return self.user.role == "admin"
+    def is_admin(self) -> bool:  # a hackathon judge sees the admin console, read-only
+        return self.user.role in ("admin", "judge")
+
+    @property
+    def is_judge(self) -> bool:
+        return self.user.role == "judge"
 
     @property
     def actor(self) -> str:
@@ -98,8 +102,15 @@ def current(request: Request, db: Session = Depends(get_db)) -> Ctx:
     user = db.get(User, int(data["sub"]))
     if user is None:
         raise HTTPException(401, "Please sign in.")
+    if user.role == "judge" and request.method not in ("GET", "HEAD") and request.url.path not in JUDGE_CAN_POST:
+        raise HTTPException(403, "This is a view-only tour, so nothing here can be changed. To try Clone Flow yourself, "
+                                 "choose \u201cTry it yourself\u201d on the home page.")
     org = db.get(Org, user.org_id)
     return Ctx(user=user, org=org, db=db)
+
+
+# What a judge on the view-only tour may still do: ask the knowledge base (by text or voice) and sign out.
+JUDGE_CAN_POST = {"/api/ask", "/api/voice/transcribe", "/api/auth/logout"}
 
 
 def require_admin(ctx: Ctx = Depends(current)) -> Ctx:

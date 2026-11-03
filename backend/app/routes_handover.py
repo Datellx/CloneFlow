@@ -318,7 +318,7 @@ def _invite_row(ctx: Ctx, i, clones) -> dict:
     c = next((c for c in clones if (c.settings or {}).get("owner_email") == i.email), None)
     return {"id": i.id, "email": i.email, "name": c.expert_name if c else (i.name or i.email), "eid": c.id if c else None,
             "kind": "handover" if c else (i.kind or "colleague"),
-            "accepted": i.accepted, "link": f"{settings.public_url.rstrip('/')}/join/{i.code}",
+            "accepted": i.accepted, "link": None if ctx.is_judge else f"{settings.public_url.rstrip('/')}/join/{i.code}",
             "created_at": core.iso(i.created_at)}
 
 
@@ -490,6 +490,8 @@ def admin_diag_log(ctx: Ctx = Depends(current)):
     from .main import RECENT_LOG
 
     _admin(ctx)
+    if ctx.is_judge:
+        raise HTTPException(403, "Only the company admin can see this.")
     from backend.media.sam import rss_mb
 
     return {"rss_mb": rss_mb(), "lines": list(RECENT_LOG.lines)}
